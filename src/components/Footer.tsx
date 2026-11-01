@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import Container from "@/components/Container";
 import { siteConfig } from "@/config/siteConfig";
 
 const shopLinks = [
@@ -30,7 +31,7 @@ export default function Footer() {
 
   return (
     <footer className="mt-auto bg-dark text-background">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+      <Container className="py-14">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
           {/* Brand + contact */}
           <div className="space-y-4">
@@ -118,11 +119,11 @@ export default function Footer() {
           </ul>
         </div>
         </div>
-      </div>
+      </Container>
 
       {/* Bottom bar */}
       <div className="border-t border-background/10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-background/60 sm:flex-row sm:px-6 lg:px-8">
+        <Container className="flex flex-col items-center justify-between gap-2 py-6 text-xs text-background/60 sm:flex-row">
           <p>
             © {currentYear} {siteConfig.legalName}. All rights
             reserved.
@@ -135,7 +136,7 @@ export default function Footer() {
               Terms of Service
             </Link>
           </div>
-        </div>
+        </Container>
       </div>
     </footer>
   );

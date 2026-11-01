@@ -5,11 +5,13 @@ import { siteConfig } from "@/config/siteConfig";
 import { navLinks } from "@/config/nav";
 import MobileMenu from "@/components/MobileMenu";
 import CartButton from "@/components/CartButton";
+import WishlistButton from "@/components/WishlistButton";
+import Container from "@/components/Container";
 
 export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-surface/90 backdrop-blur">
-      <div className="mx-auto flex h-20 w-[90%] items-center justify-between gap-4">
+      <Container className="flex h-20 items-center justify-between gap-4">
         {/* Brand */}
         <Link href="/" aria-label={`${siteConfig.name} — Home`} className="flex shrink-0 items-center">
           <Image
@@ -74,12 +76,14 @@ export default function Header() {
             <User className="h-6 w-6" strokeWidth={1.8} aria-hidden="true" />
           </Link>
 
+          <WishlistButton />
+
           <CartButton />
         </div>
 
         {/* Mobile menu (hamburger + full-screen overlay) */}
         <MobileMenu />
-      </div>
+      </Container>
     </header>
   );
 }

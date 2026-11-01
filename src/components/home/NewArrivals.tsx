@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import ViewAllButton from "@/components/ViewAllButton";
+import Container from "@/components/Container";
 
 // ⬇️ Replace the `image` URLs with your own product image URLs.
 const products = [
@@ -33,7 +34,7 @@ const products = [
 export default function NewArrivals() {
   return (
     <section className="bg-background py-20 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <Container>
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-secondary">
             New Arrival
@@ -73,7 +74,7 @@ export default function NewArrivals() {
         </div>
 
         <ViewAllButton href="/collections/new-arrivals" />
-      </div>
+      </Container>
     </section>
   );
 }

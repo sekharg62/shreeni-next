@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Hero() {
   return (
     <section className="relative overflow-hidden bg-background">
-      <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-28">
+      <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-28">
         {/* Copy */}
         <div className="text-center lg:text-left">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-secondary">

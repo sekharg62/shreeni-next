@@ -1,9 +1,10 @@
 import ViewAllButton from "@/components/ViewAllButton";
+import Container from "@/components/Container";
 
 export default function AffordableSarees() {
   return (
     <section className="bg-background py-20 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <Container>
         <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-primary to-dark px-6 py-16 text-center text-surface sm:px-12 sm:py-20">
           {/* Decorative gold accent */}
           <div className="mx-auto mb-6 h-0.5 w-16 bg-secondary" />
@@ -24,7 +25,7 @@ export default function AffordableSarees() {
             />
           </div>
         </div>
-      </div>
+      </Container>
     </section>
   );
 }

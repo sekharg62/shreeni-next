@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import ViewAllButton from "@/components/ViewAllButton";
+import Container from "@/components/Container";
 
 // ⬇️ Replace the `image` URLs with your own product image URLs.
 const products = [
@@ -33,7 +34,7 @@ const products = [
 export default function BestSellers() {
   return (
     <section className="bg-surface py-20 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <Container>
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-secondary">
             Best Sellers
@@ -76,7 +77,7 @@ export default function BestSellers() {
         </div>
 
         <ViewAllButton href="/collections/best-sellers" />
-      </div>
+      </Container>
     </section>
   );
 }

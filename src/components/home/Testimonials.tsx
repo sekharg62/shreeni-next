@@ -1,4 +1,5 @@
 import SectionHeader from "@/components/SectionHeader";
+import Container from "@/components/Container";
 
 const testimonials = [
   {
@@ -42,7 +43,7 @@ function Stars() {
 export default function Testimonials() {
   return (
     <section className="bg-background py-20 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <Container>
         <SectionHeader
           eyebrow="Loved by Customers"
           title="What our customers say"
@@ -66,7 +67,7 @@ export default function Testimonials() {
             </figure>
           ))}
         </div>
-      </div>
+      </Container>
     </section>
   );
 }
