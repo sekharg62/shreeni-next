@@ -1,8 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Search, User } from "lucide-react";
 import { siteConfig } from "@/config/siteConfig";
 import { navLinks } from "@/config/nav";
 import MobileMenu from "@/components/MobileMenu";
+import CartButton from "@/components/CartButton";
 
 export default function Header() {
   return (
@@ -61,20 +63,7 @@ export default function Header() {
             aria-label="Search"
             className="rounded-full p-2 text-dark transition-colors hover:bg-background hover:text-primary"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6"
-              aria-hidden="true"
-            >
-              <circle cx="11" cy="11" r="7" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
+            <Search className="h-6 w-6" strokeWidth={1.8} aria-hidden="true" />
           </Link>
 
           <Link
@@ -82,43 +71,10 @@ export default function Header() {
             aria-label="Account"
             className="rounded-full p-2 text-dark transition-colors hover:bg-background hover:text-primary"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" />
-            </svg>
+            <User className="h-6 w-6" strokeWidth={1.8} aria-hidden="true" />
           </Link>
 
-          <Link
-            href="/cart"
-            aria-label="Cart"
-            className="relative rounded-full p-2 text-dark transition-colors hover:bg-background hover:text-primary"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6"
-              aria-hidden="true"
-            >
-              <circle cx="9" cy="20" r="1.4" />
-              <circle cx="18" cy="20" r="1.4" />
-              <path d="M2.5 3h2l2.2 12.3a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.2L21 7H6" />
-            </svg>
-          </Link>
+          <CartButton />
         </div>
 
         {/* Mobile menu (hamburger + full-screen overlay) */}

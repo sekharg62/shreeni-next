@@ -3,19 +3,21 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 import { navLinks } from "@/config/nav";
 import { siteConfig } from "@/config/siteConfig";
+import { useCart } from "@/context/CartContext";
 
 const quickLinks = [
   { label: "Search", href: "/search" },
   { label: "Account", href: "/account" },
-  { label: "Cart", href: "/cart" },
 ];
 
 export default function MobileMenu() {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const { openCart, itemCount } = useCart();
 
   useEffect(() => setMounted(true), []);
 
@@ -103,20 +105,12 @@ export default function MobileMenu() {
                       className="flex w-full items-center justify-between gap-4 py-4 text-left font-serif text-3xl font-semibold text-surface transition-colors hover:text-secondary"
                     >
                       <span>{link.label}</span>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                      <ChevronDown
                         className={`h-6 w-6 shrink-0 text-surface/80 transition-transform duration-300 ${
                           isExpanded ? "rotate-180" : ""
                         }`}
                         aria-hidden="true"
-                      >
-                        <polyline points="6 9 12 15 18 9" />
-                      </svg>
+                      />
                     </button>
 
                     {/* Smoothly animated sub-item list */}
@@ -168,6 +162,16 @@ export default function MobileMenu() {
                     {link.label}
                   </Link>
                 ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    close();
+                    openCart();
+                  }}
+                  className="text-sm uppercase tracking-wider text-surface/80 transition-colors hover:text-secondary"
+                >
+                  Cart{itemCount > 0 ? ` (${itemCount})` : ""}
+                </button>
               </div>
               <p className="mt-5 text-sm text-surface/70">
                 {siteConfig.contact.phone}
