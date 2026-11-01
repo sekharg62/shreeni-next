@@ -1,0 +1,142 @@
+import Link from "next/link";
+import Image from "next/image";
+import { siteConfig } from "@/config/siteConfig";
+
+const shopLinks = [
+  { label: "Silk Sarees", href: "/sarees/silk" },
+  { label: "Cotton Sarees", href: "/sarees/cotton" },
+  { label: "Designer Sarees", href: "/sarees/designer" },
+  { label: "New Arrivals", href: "/collections/new" },
+];
+
+const helpLinks = [
+  { label: "Shipping & Delivery", href: "/shipping" },
+  { label: "Returns & Exchange", href: "/returns" },
+  { label: "Track Order", href: "/track" },
+  { label: "FAQs", href: "/faqs" },
+];
+
+const socialLinks = [
+  { label: "Instagram", href: siteConfig.social.instagram },
+  { label: "Facebook", href: siteConfig.social.facebook },
+  { label: "YouTube", href: siteConfig.social.youtube },
+  { label: "Pinterest", href: siteConfig.social.pinterest },
+];
+
+const currentYear = new Date().getFullYear();
+
+export default function Footer() {
+  const { contact, location } = siteConfig;
+
+  return (
+    <footer className="mt-auto bg-dark text-background">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
+          {/* Brand + contact */}
+          <div className="space-y-4">
+          <Image
+            src="/logo-footer.png"
+            alt={`${siteConfig.name} Sarees`}
+            width={1024}
+            height={335}
+            unoptimized
+            className="h-20 w-auto"
+          />
+          <p className="max-w-xs text-sm text-background/70">
+            {siteConfig.tagline}
+          </p>
+          <address className="space-y-1 text-sm not-italic text-background/70">
+            <p>
+              {location.addressLine1}, {location.addressLine2}
+            </p>
+            <p>
+              {location.city}, {location.state} {location.postalCode}
+            </p>
+            <p>
+              <a href={`mailto:${contact.email}`} className="hover:text-secondary">
+                {contact.email}
+              </a>
+            </p>
+            <p>
+              <a href={`tel:${contact.phone}`} className="hover:text-secondary">
+                {contact.phone}
+              </a>
+            </p>
+          </address>
+        </div>
+
+        {/* Shop */}
+        <div>
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-secondary">
+            Shop
+          </h3>
+          <ul className="space-y-2 text-sm text-background/70">
+            {shopLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="hover:text-secondary">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Help */}
+        <div>
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-secondary">
+            Help
+          </h3>
+          <ul className="space-y-2 text-sm text-background/70">
+            {helpLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="hover:text-secondary">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Social */}
+        <div>
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-secondary">
+            Follow Us
+          </h3>
+          <ul className="space-y-2 text-sm text-background/70">
+            {socialLinks.map((link) => (
+              <li key={link.label}>
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-secondary"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="border-t border-background/10">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-background/60 sm:flex-row sm:px-6 lg:px-8">
+          <p>
+            © {currentYear} {siteConfig.legalName}. All rights
+            reserved.
+          </p>
+          <div className="flex gap-4">
+            <Link href="/privacy" className="hover:text-secondary">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-secondary">
+              Terms of Service
+            </Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
