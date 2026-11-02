@@ -76,7 +76,7 @@ export default function MobileMenu() {
             }`}
           >
             {/* Nav items */}
-            <nav className="flex flex-1 flex-col gap-1 overflow-y-auto py-2">
+            <nav className="no-scrollbar flex flex-1 flex-col gap-1 overflow-y-auto py-2">
               {navLinks.map((link) => {
                 // Leaf item (no sub-menu) — plain link.
                 if (!link.items) {

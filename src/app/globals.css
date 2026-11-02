@@ -56,3 +56,12 @@ h5,
 h6 {
   font-family: var(--font-serif), Georgia, "Times New Roman", serif;
 }
+
+/* Hide scrollbar while keeping the element scrollable */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
