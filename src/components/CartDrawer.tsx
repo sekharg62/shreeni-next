@@ -2,12 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { ShoppingCart, X } from "lucide-react";
+import { ShoppingCart, Trash2, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import QuantityStepper from "@/components/ui/QuantityStepper";
 
 export default function CartDrawer() {
-  const { isOpen, closeCart, items, itemCount, subtotal, removeItem } =
-    useCart();
+  const {
+    isOpen,
+    closeCart,
+    items,
+    itemCount,
+    subtotal,
+    removeItem,
+    updateQuantity,
+  } = useCart();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -108,18 +116,27 @@ export default function CartDrawer() {
                     <p className="font-serif font-semibold text-dark">
                       {item.name}
                     </p>
-                    <p className="text-sm text-muted">Qty {item.quantity}</p>
-                    <p className="mt-auto text-sm font-medium text-secondary">
+                    <p className="text-sm font-medium text-secondary">
                       ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                     </p>
+
+                    {/* Quantity stepper */}
+                    <div className="mt-auto">
+                      <QuantityStepper
+                        value={item.quantity}
+                        onChange={(next) => updateQuantity(item.id, next)}
+                        min={1}
+                        size="sm"
+                      />
+                    </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => removeItem(item.id)}
                     aria-label={`Remove ${item.name}`}
-                    className="self-start text-muted transition-colors hover:text-primary"
+                    className="self-start text-muted transition-colors hover:text-red-500"
                   >
-                    <X className="h-4 w-4" aria-hidden="true" />
+                    <Trash2 className="h-5 w-5" aria-hidden="true" />
                   </button>
                 </li>
               ))}

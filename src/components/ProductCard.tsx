@@ -5,10 +5,12 @@ import { Heart, ShoppingCart } from "lucide-react";
 import type { Product } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useToast } from "@/context/ToastContext";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { addItem, openCart } = useCart();
   const { isWishlisted, toggle } = useWishlist();
+  const toast = useToast();
   const wishlisted = isWishlisted(product.id);
   const outOfStock = product.inStock === false;
 
@@ -19,9 +21,23 @@ export default function ProductCard({ product }: { product: Product }) {
     image: product.image,
   };
 
+  const addToCart = () => {
+    addItem(cartPayload);
+    toast.success(`${product.name} added to cart`);
+  };
+
   const buyNow = () => {
     addItem(cartPayload);
     openCart();
+  };
+
+  const toggleWishlist = () => {
+    toggle(product.id);
+    if (wishlisted) {
+      toast.info(`${product.name} removed from wishlist`);
+    } else {
+      toast.success(`${product.name} saved to wishlist`);
+    }
   };
 
   return (
@@ -47,7 +63,7 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* Wishlist heart */}
         <button
           type="button"
-          onClick={() => toggle(product.id)}
+          onClick={toggleWishlist}
           aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           aria-pressed={wishlisted}
           className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-surface/90 text-dark shadow-sm backdrop-blur transition-colors hover:text-red-500"
@@ -83,7 +99,7 @@ export default function ProductCard({ product }: { product: Product }) {
             <>
               <button
                 type="button"
-                onClick={() => addItem(cartPayload)}
+                onClick={addToCart}
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-primary px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-primary transition-colors hover:bg-primary hover:text-surface"
               >
                 <ShoppingCart className="h-4 w-4" aria-hidden="true" />
