@@ -8,6 +8,8 @@
  * NOTE: All values below are DUMMY placeholders — replace before launch.
  */
 
+import { env } from "./env";
+
 export const siteConfig = {
   // --- Brand / identity ---
   name: "Shreeni",
@@ -15,7 +17,8 @@ export const siteConfig = {
   tagline: "Timeless sarees, woven for every occasion",
   description:
     "Shop handpicked silk, cotton, and designer sarees online. Authentic weaves, elegant drapes, and fast delivery across India.",
-  url: "https://www.shreeni.example.com",
+  url: env.siteUrl,
+  apiBaseUrl: env.apiBaseUrl,
   locale: "en_IN",
 
   // --- SEO ---
