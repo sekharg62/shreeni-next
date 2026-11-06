@@ -3,6 +3,10 @@ export const ENDPOINTS = {
   banners: {
     list: "/banners",
   },
+  categories: {
+    /** ?slug=<parent> → its published children */
+    children: "/categories/children",
+  },
   auth: {
     login: "/auth/login",
   },

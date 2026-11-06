@@ -1,14 +1,12 @@
 import { cacheLife, cacheTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/constants";
 import { bannerService } from "@/services/bannerService";
 import type { Banner } from "@/types/banner";
 import HeroCarousel from "./HeroCarousel";
 
-/** Tag to pass to `revalidateTag` / `updateTag` when banners change. */
-export const BANNERS_CACHE_TAG = "banners";
-
 async function getHomeBanners(): Promise<Banner[]> {
   "use cache";
-  cacheTag(BANNERS_CACHE_TAG);
+  cacheTag(CACHE_TAGS.banners);
   try {
     const banners = await bannerService.list();
     cacheLife("minutes"); // admin edits show up within about a minute
