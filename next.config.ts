@@ -4,7 +4,9 @@ const nextConfig: NextConfig = {
   /* config options here */
   images: {
     remotePatterns: [
-      // Allow external carousel image URLs. Add your own image host here.
+      // Shreeni S3 bucket: banners, categories and product photos.
+      { protocol: "https", hostname: "shreeni-collection.s3.ap-south-1.amazonaws.com", pathname: "/**" },
+      // Placeholder images still used by the static product data.
       { protocol: "https", hostname: "picsum.photos" },
       { protocol: "https", hostname: "images.unsplash.com" },
     ],
