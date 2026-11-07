@@ -1,8 +1,12 @@
+import { whatsappHref } from "@/lib/contact";
+
 export default function WhatsAppButton() {
   return (
     <a
-      href="#"
-      aria-label="Chat with us on WhatsApp"
+      href={whatsappHref("Hi Shreeni! I have a question.")}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Chat with us on WhatsApp (opens in a new tab)"
       className="fixed bottom-20 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform duration-300 hover:scale-105"
     >
       <svg

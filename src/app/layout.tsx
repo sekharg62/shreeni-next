@@ -5,8 +5,6 @@ import AnnouncementBar from "@/components/AnnouncementBar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
-import BackToTop from "@/components/BackToTop";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { ToastProvider } from "@/context/ToastContext";
@@ -53,8 +51,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <main className="flex-1">{children}</main>
             <Footer />
             <CartDrawer />
-            <WhatsAppButton />
-            <BackToTop />
           </WishlistProvider>
         </CartProvider>
         </AuthProvider>

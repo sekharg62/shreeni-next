@@ -3,6 +3,8 @@ import HeroBanners from "@/components/home/HeroBanners";
 import TopCategories from "@/components/home/TopCategories";
 import AffordableSarees from "@/components/home/AffordableSarees";
 import Testimonials from "@/components/home/Testimonials";
+import WhatsAppButton from "@/components/WhatsAppButton";
+import BackToTop from "@/components/BackToTop";
 
 /*
  * API-driven sections sit in <Suspense>. Normally their data is cached and part of
@@ -37,6 +39,9 @@ export default function Home() {
       </Suspense>
       <AffordableSarees />
       <Testimonials />
+      {/* Floating helpers: homepage only. */}
+      <WhatsAppButton />
+      <BackToTop />
     </>
   );
 }

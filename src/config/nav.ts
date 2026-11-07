@@ -35,7 +35,7 @@ export const navLinks: NavLink[] = [
   },
   {
     label: "Contact",
-    href: "/contact",
+    href: "/contact/help",
     items: [
       { label: "Help Center", href: "/contact/help" },
       { label: "Store Locator", href: "/contact/stores" },
