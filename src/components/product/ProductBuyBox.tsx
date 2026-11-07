@@ -31,6 +31,7 @@ export default function ProductBuyBox({ productId, slug, name, image, price, com
   const [variantId, setVariantId] = useState<string | null>(orderable.length === 1 && variants.length === 1 ? orderable[0].id : null);
   const [quantity, setQuantity] = useState(1);
   const [sizeError, setSizeError] = useState<string | null>(null);
+  const [heartTapped, setHeartTapped] = useState(false);
 
   const variant = variants.find((v) => v.id === variantId) ?? null;
   const shownPrice = variant?.price ?? price;
@@ -141,15 +142,17 @@ export default function ProductBuyBox({ productId, slug, name, image, price, com
         <button
           type="button"
           onClick={() => {
-            toggle(productId);
-            if (wishlisted) toast.info(`${name} removed from wishlist`);
-            else toast.success(`${name} saved to wishlist`);
+            setHeartTapped(true);
+            toggle({ id: productId, slug, name, image, price, compareAtPrice });
           }}
           aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           aria-pressed={wishlisted}
           className="inline-flex h-12 w-12 shrink-0 items-center justify-center self-center rounded-full border border-border text-dark transition-colors hover:border-red-400 hover:text-red-500"
         >
-          <Heart className={`h-5 w-5 ${wishlisted ? "fill-red-500 text-red-500" : ""}`} aria-hidden="true" />
+          <Heart
+            className={`h-5 w-5 transition-colors ${wishlisted ? `fill-red-500 text-red-500 ${heartTapped ? "heart-pop" : ""}` : ""}`}
+            aria-hidden="true"
+          />
         </button>
       </div>
     </div>

@@ -29,6 +29,14 @@ export const ENDPOINTS = {
     /** PATCH — make default */
     makeDefault: (id: string) => `/me/addresses/${encodeURIComponent(id)}/default`,
   },
+  wishlist: {
+    /** GET saved products as cards (signed-in customer) */
+    list: "/me/wishlist",
+    /** PUT save · DELETE remove */
+    one: (productId: string) => `/me/wishlist/${encodeURIComponent(productId)}`,
+    /** POST { productIds } — add a guest's items after sign-in; returns the full list */
+    merge: "/me/wishlist/merge",
+  },
   auth: {
     register: "/auth/register",
     /** customers only — the admin panel uses /admin/auth/login */

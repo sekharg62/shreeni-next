@@ -1,47 +1,118 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { CloudOff, Heart, RotateCw, UserRound } from "lucide-react";
 import Container from "@/components/Container";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/data/products";
+import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
 
+function CardSkeleton() {
+  return (
+    <div aria-hidden="true" className="overflow-hidden rounded-md border border-border bg-surface">
+      <div className="aspect-[3/4] animate-pulse bg-background" />
+      <div className="space-y-2 p-4">
+        <div className="h-4 w-3/4 animate-pulse rounded bg-background" />
+        <div className="h-3 w-1/3 animate-pulse rounded bg-background" />
+        <div className="mt-4 h-9 animate-pulse rounded-full bg-background" />
+      </div>
+    </div>
+  );
+}
+
 export default function WishlistPage() {
-  const { ids, count } = useWishlist();
-  const wishlistProducts = products.filter((p) => ids.includes(p.id));
+  const { items, count, status, synced, reload } = useWishlist();
+  const { status: authStatus } = useAuth();
+  const loading = status === "loading" || authStatus === "loading";
+
+  // Fresh prices and availability each time the page is opened.
+  useEffect(() => {
+    reload();
+  }, [reload]);
 
   return (
     <section className="py-16 sm:py-20">
       <Container>
-        <header className="border-b border-border pb-8">
-          <h1 className="font-serif text-3xl font-semibold text-primary sm:text-4xl">
-            My Wishlist
-          </h1>
-          <p className="mt-3 text-muted">
-            {count} {count === 1 ? "item" : "items"} saved
-          </p>
+        <header className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-8">
+          <div>
+            <h1 className="font-serif text-3xl font-semibold text-primary sm:text-4xl">My Wishlist</h1>
+            <p className="mt-3 text-muted" aria-live="polite">
+              {loading ? "Loading your saved items…" : `${count} ${count === 1 ? "item" : "items"} saved`}
+            </p>
+          </div>
         </header>
 
-        {wishlistProducts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
-            <Heart className="h-14 w-14 text-border" strokeWidth={1.5} aria-hidden="true" />
-            <p className="font-serif text-lg font-semibold text-dark">
-              Your wishlist is empty
-            </p>
-            <p className="max-w-sm text-sm text-muted">
-              Tap the heart on any product to save it here for later.
-            </p>
+        {/* Guest with saved items: they live in this browser only. */}
+        {!loading && !synced && count > 0 && (
+          <div className="mt-8 flex flex-col gap-4 rounded-lg border border-border bg-surface p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <UserRound className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+              <div>
+                <p className="font-medium text-dark">Your wishlist is saved on this device only</p>
+                <p className="mt-1 text-sm text-muted">Sign in to keep it safe and see it on your phone and computer.</p>
+              </div>
+            </div>
             <Link
-              href="/sarees/silk"
-              className="mt-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-wider text-surface transition-colors hover:bg-dark"
+              href="/account"
+              className="shrink-0 rounded-full bg-primary px-6 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-surface transition-colors hover:bg-dark"
             >
-              Explore Sarees
+              Sign in
             </Link>
           </div>
+        )}
+
+        {/* Couldn't load the account's list. */}
+        {status === "error" && (
+          <div
+            role="alert"
+            className="mt-8 flex flex-col gap-4 rounded-lg border border-red-200 bg-red-50 p-5 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div className="flex items-start gap-3">
+              <CloudOff className="mt-0.5 h-5 w-5 shrink-0 text-red-600" aria-hidden="true" />
+              <div>
+                <p className="font-medium text-dark">We couldn&apos;t load your wishlist</p>
+                <p className="mt-1 text-sm text-muted">Check your connection and try again.</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={reload}
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full border border-dark px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-dark transition-colors hover:bg-dark hover:text-surface"
+            >
+              <RotateCw className="h-4 w-4" aria-hidden="true" /> Try again
+            </button>
+          </div>
+        )}
+
+        {loading && count === 0 ? (
+          <div className="mt-10 grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4" aria-busy="true">
+            {Array.from({ length: 4 }, (_, i) => (
+              <CardSkeleton key={i} />
+            ))}
+          </div>
+        ) : count === 0 ? (
+          status !== "error" && (
+            <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
+              <span className="flex h-20 w-20 items-center justify-center rounded-full bg-background">
+                <Heart className="h-10 w-10 text-primary/40" strokeWidth={1.5} aria-hidden="true" />
+              </span>
+              <p className="font-serif text-lg font-semibold text-dark">Your wishlist is empty</p>
+              <p className="max-w-sm text-sm text-muted">Tap the heart on any saree to save it here for later.</p>
+              <Link
+                href="/sarees/silk"
+                className="mt-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-wider text-surface transition-colors hover:bg-dark"
+              >
+                Explore Sarees
+              </Link>
+            </div>
+          )
         ) : (
-          <div className="mt-10 grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
-            {wishlistProducts.map((product) => (
+          <div
+            className={`mt-10 grid grid-cols-2 gap-6 transition-opacity md:grid-cols-3 lg:grid-cols-4 ${loading ? "opacity-60" : ""}`}
+            aria-busy={loading}
+          >
+            {items.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

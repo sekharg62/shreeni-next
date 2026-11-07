@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Heart, ShoppingCart } from "lucide-react";
@@ -34,13 +35,11 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
     openCart();
   };
 
+  // Pop the heart only when the shopper saves it (not for hearts already filled on load).
+  const [tapped, setTapped] = useState(false);
   const toggleWishlist = () => {
-    toggle(product.id);
-    if (wishlisted) {
-      toast.info(`${product.name} removed from wishlist`);
-    } else {
-      toast.success(`${product.name} saved to wishlist`);
-    }
+    setTapped(true);
+    toggle(product);
   };
 
   return (
@@ -88,7 +87,7 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
         >
           <Heart
             className={`h-5 w-5 transition-colors ${
-              wishlisted ? "fill-red-500 text-red-500" : ""
+              wishlisted ? `fill-red-500 text-red-500 ${tapped ? "heart-pop" : ""}` : ""
             }`}
             aria-hidden="true"
           />
