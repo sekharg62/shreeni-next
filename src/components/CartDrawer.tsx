@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { ShoppingCart, Trash2, X } from "lucide-react";
-import { useCart } from "@/context/CartContext";
+import { AlertCircle, Info, ShoppingCart, Trash2, X } from "lucide-react";
+import { isBlocked, useCart, type CartItem } from "@/context/CartContext";
+import { formatINR } from "@/lib/format";
 import QuantityStepper from "@/components/ui/QuantityStepper";
 
 export default function CartDrawer() {
@@ -16,7 +17,9 @@ export default function CartDrawer() {
     subtotal,
     removeItem,
     updateQuantity,
+    changed,
   } = useCart();
+  const blockedCount = items.filter(isBlocked).length;
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -102,9 +105,15 @@ export default function CartDrawer() {
           </div>
         ) : (
           <>
+            {changed && (
+              <p className="flex items-start gap-2 border-b border-border bg-amber-50 px-5 py-3 text-xs text-amber-900">
+                <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                Some prices or stock changed since you added these items. Your cart shows the latest.
+              </p>
+            )}
             <ul className="flex-1 divide-y divide-border overflow-y-auto px-5">
               {items.map((item) => (
-                <li key={item.id} className="flex gap-4 py-4">
+                <li key={item.id} className={`flex gap-4 py-4 ${isBlocked(item) ? "opacity-70" : ""}`}>
                   <div className="h-20 w-16 shrink-0 overflow-hidden rounded bg-background">
                     {item.image && (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -130,20 +139,29 @@ export default function CartDrawer() {
                         Choose a size
                       </Link>
                     ) : null}
-                    <p className="text-sm font-medium text-secondary">
-                      ₹{(item.price * item.quantity).toLocaleString("en-IN")}
+                    <p className="flex flex-wrap items-baseline gap-x-2 text-sm">
+                      <span className="font-medium text-secondary">{formatINR(item.price * item.quantity)}</span>
+                      {item.compareAtPrice != null && item.compareAtPrice > item.price && (
+                        <span className="text-xs text-muted line-through">
+                          <span className="sr-only">Original price </span>
+                          {formatINR(item.compareAtPrice * item.quantity)}
+                        </span>
+                      )}
                     </p>
+                    <LineNote item={item} />
 
                     {/* Quantity stepper */}
-                    <div className="mt-auto">
-                      <QuantityStepper
-                        value={item.quantity}
-                        onChange={(next) => updateQuantity(item.id, next)}
-                        min={1}
-                        max={item.maxQuantity}
-                        size="sm"
-                      />
-                    </div>
+                    {!isBlocked(item) && (
+                      <div className="mt-auto pt-2">
+                        <QuantityStepper
+                          value={item.quantity}
+                          onChange={(next) => updateQuantity(item.id, next)}
+                          min={1}
+                          max={item.maxQuantity}
+                          size="sm"
+                        />
+                      </div>
+                    )}
                   </div>
                   <button
                     type="button"
@@ -162,10 +180,14 @@ export default function CartDrawer() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted">Subtotal</span>
                 <span className="font-serif text-lg font-semibold text-dark">
-                  ₹{subtotal.toLocaleString("en-IN")}
+                  {formatINR(subtotal)}
                 </span>
               </div>
-              <p className="mt-1 text-xs text-muted">Shipping calculated at checkout.</p>
+              <p className="mt-1 text-xs text-muted">
+                {blockedCount > 0
+                  ? `${blockedCount} unavailable item${blockedCount === 1 ? " is" : "s are"} not included. Remove ${blockedCount === 1 ? "it" : "them"} to check out.`
+                  : "Shipping calculated at checkout."}
+              </p>
               <Link
                 href="/checkout"
                 onClick={closeCart}
@@ -179,5 +201,27 @@ export default function CartDrawer() {
       </aside>
     </div>,
     document.body
+  );
+}
+
+/** Why a line changed or can't be bought. */
+function LineNote({ item }: { item: CartItem }) {
+  if (!item.issue) {
+    return item.maxQuantity !== undefined && item.maxQuantity <= 3 && item.quantity >= item.maxQuantity ? (
+      <p className="mt-1 text-xs text-amber-700">Only {item.maxQuantity} left</p>
+    ) : null;
+  }
+  const text =
+    item.issue === "QUANTITY_REDUCED"
+      ? `Only ${item.maxQuantity} left — quantity updated`
+      : item.issue === "OUT_OF_STOCK"
+        ? "Out of stock — remove to continue"
+        : "No longer available — remove to continue";
+  const tone = item.issue === "QUANTITY_REDUCED" ? "text-amber-700" : "text-red-700";
+  return (
+    <p className={`mt-1 flex items-center gap-1 text-xs font-medium ${tone}`}>
+      <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+      {text}
+    </p>
   );
 }

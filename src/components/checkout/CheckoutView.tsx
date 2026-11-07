@@ -8,7 +8,7 @@ import AddressFields, { focusFirstAddressError } from "@/components/address/Addr
 import Input from "@/components/ui/Input";
 import OrderSummary, { needsSize } from "./OrderSummary";
 import { useAuth } from "@/context/AuthContext";
-import { useCart } from "@/context/CartContext";
+import { isBlocked, useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
 import { addressLines, emptyAddress, formatPhone, validateAddress, type AddressErrors } from "@/lib/address";
 import type { Address, AddressInput } from "@/types/address";
@@ -55,7 +55,7 @@ function Section({ step, title, done, children }: { step: number; title: string;
 
 export default function CheckoutView() {
   const { user, status, signOut } = useAuth();
-  const { items, ready, subtotal, itemCount } = useCart();
+  const { items, ready, subtotal, itemCount, changed, refresh } = useCart();
   const toast = useToast();
 
   const [guest, setGuest] = useState<GuestDraft | null>(null);
@@ -67,6 +67,11 @@ export default function CheckoutView() {
   const [selectError, setSelectError] = useState(false);
   const guestRef = useRef<HTMLDivElement>(null);
   const reviewRef = useRef<HTMLDivElement>(null);
+
+  // Re-check prices and stock when checkout opens.
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   // Load the guest draft once (browser only).
   useEffect(() => {
@@ -87,7 +92,8 @@ export default function CheckoutView() {
     if (review) reviewRef.current?.focus();
   }, [review]);
 
-  const blocked = items.filter(needsSize);
+  // Items without a size, or that sold out / went off sale, must be fixed first.
+  const blocked = items.filter((i) => needsSize(i) || isBlocked(i));
 
   /* ───── loading / empty ───── */
   if (!ready || status === "loading" || !guest) {
@@ -135,7 +141,7 @@ export default function CheckoutView() {
 
   const continueToReview = () => {
     if (blocked.length) {
-      toast.error("Choose a size for every item before continuing.");
+      toast.error("Some items in your cart can't be ordered. Remove or update them to continue.");
       return;
     }
     let delivery: Delivery;
@@ -241,7 +247,13 @@ export default function CheckoutView() {
 
         {blocked.length > 0 && (
           <p role="alert" className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-            {blocked.length === 1 ? "1 item needs" : `${blocked.length} items need`} a size before you can continue — see the order summary.
+            {blocked.length === 1 ? "1 item is" : `${blocked.length} items are`} out of stock or unavailable. Remove{" "}
+            {blocked.length === 1 ? "it" : "them"} from your cart to continue — see the order summary.
+          </p>
+        )}
+        {changed && blocked.length === 0 && (
+          <p role="status" className="rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900">
+            Some prices or stock changed since you added these items. Your order summary shows the latest.
           </p>
         )}
 

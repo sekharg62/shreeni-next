@@ -31,7 +31,11 @@ function Lines({ items }: { items: CartItem[] }) {
           </div>
           <div className="min-w-0 flex-1 text-sm">
             <p className="font-medium text-dark">{i.name}</p>
-            {i.size ? (
+            {i.issue === "OUT_OF_STOCK" || i.issue === "UNAVAILABLE" ? (
+              <p className="text-xs font-semibold text-red-700">
+                {i.issue === "OUT_OF_STOCK" ? "Out of stock" : "No longer available"} — remove from cart
+              </p>
+            ) : i.size ? (
               <p className="text-xs text-muted">Size: {i.size}</p>
             ) : needsSize(i) ? (
               <Link href={`/products/${i.slug}`} className="text-xs font-semibold text-amber-700 underline underline-offset-2">

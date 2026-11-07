@@ -37,6 +37,16 @@ export const ENDPOINTS = {
     /** POST { productIds } — add a guest's items after sign-in; returns the full list */
     merge: "/me/wishlist/merge",
   },
+  cart: {
+    /** GET the signed-in customer's cart · DELETE empties it */
+    mine: "/me/cart",
+    /** PUT { quantity } sets (0 removes) · DELETE removes */
+    item: (variantId: string) => `/me/cart/items/${encodeURIComponent(variantId)}`,
+    /** POST { items } — add a guest's cart after sign-in */
+    merge: "/me/cart/merge",
+    /** POST { items } — live prices/stock for a guest cart (public, saves nothing) */
+    preview: "/cart/preview",
+  },
   support: {
     /** GET ?page=&limit= · POST { reason, description } (signed-in customer) */
     list: "/me/support-tickets",

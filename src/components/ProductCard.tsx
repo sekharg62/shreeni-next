@@ -3,37 +3,16 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart } from "lucide-react";
 import type { ProductCardItem } from "@/types/product";
 import { formatINR } from "@/lib/format";
-import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { useToast } from "@/context/ToastContext";
 
 export default function ProductCard({ product }: { product: ProductCardItem }) {
-  const { addItem, openCart } = useCart();
   const { isWishlisted, toggle } = useWishlist();
-  const toast = useToast();
   const wishlisted = isWishlisted(product.id);
   const outOfStock = product.inStock === false;
   const href = product.slug ? `/products/${product.slug}` : null;
-
-  const cartPayload = {
-    id: product.id,
-    name: product.name,
-    price: product.price,
-    image: product.image,
-  };
-
-  const addToCart = () => {
-    addItem(cartPayload);
-    toast.success(`${product.name} added to cart`);
-  };
-
-  const buyNow = () => {
-    addItem(cartPayload);
-    openCart();
-  };
 
   // Pop the heart only when the shopper saves it (not for hearts already filled on load).
   const [tapped, setTapped] = useState(false);
@@ -131,7 +110,8 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
             >
               Choose size
             </Link>
-          ) : outOfStock ? (
+          ) : (
+            // No product page (old demo data): there's no size to add, so it can't go in the cart.
             <button
               type="button"
               disabled
@@ -139,24 +119,6 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
             >
               Unavailable
             </button>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={addToCart}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-primary px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-primary transition-colors hover:bg-primary hover:text-surface"
-              >
-                <ShoppingCart className="h-4 w-4" aria-hidden="true" />
-                Add to Cart
-              </button>
-              <button
-                type="button"
-                onClick={buyNow}
-                className="rounded-full bg-primary px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-surface transition-colors hover:bg-dark"
-              >
-                Buy Now
-              </button>
-            </>
           )}
         </div>
       </div>
