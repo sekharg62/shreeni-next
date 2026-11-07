@@ -59,7 +59,7 @@ export default function Footer() {
               </a>
             </p>
             <p>
-              <a href={`tel:${contact.phone}`} className="hover:text-secondary">
+              <a href={`tel:${contact.phone.replace(/\s/g, "")}`} className="hover:text-secondary">
                 {contact.phone}
               </a>
             </p>

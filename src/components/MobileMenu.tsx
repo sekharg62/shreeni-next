@@ -179,9 +179,12 @@ export default function MobileMenu() {
                   Cart{itemCount > 0 ? ` (${itemCount})` : ""}
                 </button>
               </div>
-              <p className="mt-5 text-sm text-surface/70">
+              <a
+                href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
+                className="mt-5 inline-block text-sm text-surface/70 transition-colors hover:text-secondary"
+              >
                 {siteConfig.contact.phone}
-              </p>
+              </a>
             </div>
           </div>,
           document.body

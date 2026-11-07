@@ -43,24 +43,26 @@ export const siteConfig = {
   contact: {
     email: "support@shreeni.example.com",
     salesEmail: "sales@shreeni.example.com",
-    phone: "+91 90000 00000",
-    whatsapp: "+91 90000 00000",
+    phone: "+91 97485 94143",
+    whatsapp: "+91 97485 94143",
     supportHours: "Mon–Sat, 10:00 AM – 7:00 PM IST",
   },
 
   // --- Location ---
   location: {
-    addressLine1: "123 Silk Market Road",
-    addressLine2: "Gariahat",
-    city: "Kolkata",
+    addressLine1: "14/8/A, Chowdhuri Para Street",
+    addressLine2: "Chowdhuri Para, Near Doltala",
+    city: "Halisahar",
     state: "West Bengal",
-    postalCode: "700019",
+    postalCode: "743134",
     country: "India",
     countryCode: "IN",
-    googleMapsUrl: "https://maps.google.com/?q=Shreeni+Sarees",
+    googleMapsUrl:
+      "https://www.google.com/maps/search/?api=1&query=14%2F8%2FA+Chowdhuri+Para+Street%2C+Halisahar%2C+West+Bengal+743134",
+    // Approximate (Halisahar town centre) — replace with the shop's exact pin from Google Maps.
     geo: {
-      latitude: 22.5186,
-      longitude: 88.3639,
+      latitude: 22.9483,
+      longitude: 88.4189,
     },
   },
 
