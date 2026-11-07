@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import { Heart, ShoppingCart } from "lucide-react";
-import type { Product } from "@/data/products";
+import type { ProductCardItem } from "@/types/product";
+import { formatINR } from "@/lib/format";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useToast } from "@/context/ToastContext";
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product }: { product: ProductCardItem }) {
   const { addItem, openCart } = useCart();
   const { isWishlisted, toggle } = useWishlist();
   const toast = useToast();
@@ -43,15 +44,26 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <div className="group flex flex-col overflow-hidden rounded-md border border-border bg-surface">
       <div className="relative aspect-[3/4] overflow-hidden">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className={`object-cover transition-transform duration-500 group-hover:scale-105 ${
-            outOfStock ? "opacity-60 grayscale" : ""
-          }`}
-        />
+        {product.image ? (
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className={`object-cover transition-transform duration-500 group-hover:scale-105 ${
+              outOfStock ? "opacity-60 grayscale" : ""
+            }`}
+          />
+        ) : (
+          <div
+            aria-hidden="true"
+            className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/90 via-primary to-dark"
+          >
+            <span className="font-serif text-5xl font-semibold text-surface/80">
+              {product.name.charAt(0)}
+            </span>
+          </div>
+        )}
 
         {/* Out of stock badge */}
         {outOfStock && (
@@ -81,8 +93,21 @@ export default function ProductCard({ product }: { product: Product }) {
         <h3 className="font-serif text-lg font-semibold text-dark">
           {product.name}
         </h3>
-        <p className="mt-1 text-sm font-medium text-secondary">
-          ₹{product.price.toLocaleString("en-IN")}
+        <p className="mt-1 flex flex-wrap items-baseline gap-x-2 text-sm">
+          <span className="font-medium text-secondary">
+            {formatINR(product.price)}
+          </span>
+          {product.compareAtPrice != null && product.compareAtPrice > product.price && (
+            <>
+              <span className="text-muted line-through">
+                <span className="sr-only">Original price </span>
+                {formatINR(product.compareAtPrice)}
+              </span>
+              <span className="text-xs font-semibold text-green-700">
+                {Math.round((1 - product.price / product.compareAtPrice) * 100)}% off
+              </span>
+            </>
+          )}
         </p>
 
         {/* Actions */}

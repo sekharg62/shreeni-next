@@ -6,6 +6,11 @@ export const ENDPOINTS = {
   categories: {
     /** ?slug=<parent> → its published children */
     children: "/categories/children",
+    detail: (slug: string) => `/categories/${encodeURIComponent(slug)}`,
+  },
+  products: {
+    /** ?category=<slug>&page=&limit= */
+    list: "/products",
   },
   auth: {
     login: "/auth/login",

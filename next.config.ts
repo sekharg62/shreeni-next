@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
     ],
   },
+  async redirects() {
+    return [
+      // Singular "/saree/…" links (e.g. saved on banners) → the real category route.
+      { source: "/saree/:slug", destination: "/sarees/:slug", permanent: true },
+    ];
+  },
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
