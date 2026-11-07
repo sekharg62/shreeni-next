@@ -12,6 +12,7 @@ import type { ProductVariant } from "@/types/product";
 
 type Props = {
   productId: string;
+  slug: string;
   name: string;
   image: string | null;
   price: number;
@@ -20,7 +21,7 @@ type Props = {
 };
 
 /** Price, size, quantity stepper and the cart / wishlist buttons. */
-export default function ProductBuyBox({ productId, name, image, price, compareAtPrice, variants }: Props) {
+export default function ProductBuyBox({ productId, slug, name, image, price, compareAtPrice, variants }: Props) {
   const { addItem, openCart } = useCart();
   const { isWishlisted, toggle } = useWishlist();
   const toast = useToast();
@@ -54,6 +55,7 @@ export default function ProductBuyBox({ productId, name, image, price, compareAt
       {
         id: variant.id,
         productId,
+        slug,
         variantId: variant.id,
         size: variant.size,
         name,

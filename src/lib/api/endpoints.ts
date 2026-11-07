@@ -21,6 +21,14 @@ export const ENDPOINTS = {
     /** GET — the signed-in customer's own review */
     mine: (slug: string) => `/products/${encodeURIComponent(slug)}/reviews/mine`,
   },
+  addresses: {
+    /** GET list · POST create (signed-in customer) */
+    list: "/me/addresses",
+    /** PATCH edit · DELETE */
+    one: (id: string) => `/me/addresses/${encodeURIComponent(id)}`,
+    /** PATCH — make default */
+    makeDefault: (id: string) => `/me/addresses/${encodeURIComponent(id)}/default`,
+  },
   auth: {
     register: "/auth/register",
     /** customers only — the admin panel uses /admin/auth/login */

@@ -3,14 +3,18 @@
 import { useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import ImageLightbox from "./ImageLightbox";
 
 const SWIPE_PX = 50;
+/** Movement below this counts as a tap (opens the full-screen view). */
+const TAP_PX = 8;
 
 type Props = { images: string[]; name: string };
 
 /** Main photo + thumbnails. Swipe on phones, arrows and keys on desktop. */
 export default function ProductGallery({ images, name }: Props) {
   const [index, setIndex] = useState(0);
+  const [zoomed, setZoomed] = useState(false);
   const startX = useRef<number | null>(null);
   const count = images.length;
 
@@ -29,6 +33,7 @@ export default function ProductGallery({ images, name }: Props) {
   const onKey = (e: KeyboardEvent) => {
     if (e.key === "ArrowRight") go(index + 1);
     else if (e.key === "ArrowLeft") go(index - 1);
+    else if (e.key === "Enter" && e.target === e.currentTarget) setZoomed(true);
   };
   const onDown = (e: PointerEvent) => (startX.current = e.clientX);
   const onUp = (e: PointerEvent) => {
@@ -37,6 +42,8 @@ export default function ProductGallery({ images, name }: Props) {
     startX.current = null;
     if (dx <= -SWIPE_PX) go(index + 1);
     else if (dx >= SWIPE_PX) go(index - 1);
+    // A tap on the photo itself (not the arrow buttons) opens the full-screen view.
+    else if (Math.abs(dx) < TAP_PX && !(e.target as HTMLElement).closest("button")) setZoomed(true);
   };
 
   const arrow =
@@ -53,7 +60,8 @@ export default function ProductGallery({ images, name }: Props) {
         onPointerDown={onDown}
         onPointerUp={onUp}
         onPointerCancel={() => (startX.current = null)}
-        className="relative aspect-[3/4] w-full touch-pan-y overflow-hidden rounded-lg bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary lg:flex-1"
+        title="Click to view full screen"
+        className="relative aspect-[3/4] w-full cursor-zoom-in touch-pan-y overflow-hidden rounded-lg bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary lg:flex-1"
       >
         {images.map((src, i) => (
           <Image
@@ -108,6 +116,10 @@ export default function ProductGallery({ images, name }: Props) {
             </li>
           ))}
         </ul>
+      )}
+
+      {zoomed && (
+        <ImageLightbox images={images} name={name} index={index} onIndexChange={go} onClose={() => setZoomed(false)} />
       )}
     </div>
   );

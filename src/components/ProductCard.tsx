@@ -124,7 +124,15 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
 
         {/* Actions */}
         <div className="mt-4 flex flex-col gap-2">
-          {outOfStock ? (
+          {href ? (
+            // Sarees come in sizes: pick one on the product page before adding to cart.
+            <Link
+              href={href}
+              className="rounded-full bg-primary px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-surface transition-colors hover:bg-dark"
+            >
+              Choose size
+            </Link>
+          ) : outOfStock ? (
             <button
               type="button"
               disabled

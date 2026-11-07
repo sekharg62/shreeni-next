@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Heart, LogOut, Mail, Package, Phone, User } from "lucide-react";
 import AuthForm, { type AuthMode } from "./AuthForm";
+import AddressBook from "@/components/address/AddressBook";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 
@@ -103,7 +104,18 @@ export default function AccountView() {
         </dl>
       </section>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+      <section aria-labelledby="addresses-heading" className="mt-8">
+        <h2 id="addresses-heading" className="mb-1 text-sm font-semibold uppercase tracking-wider text-dark">
+          Saved addresses
+        </h2>
+        <p className="mb-4 text-sm text-muted">Pick one at checkout — no need to type it again.</p>
+        <AddressBook
+          mode="manage"
+          prefill={{ receiverName: fullName, receiverPhone: user.phone.replace(/\D/g, "").slice(-10) }}
+        />
+      </section>
+
+      <div className="mt-8 grid gap-3 sm:grid-cols-2">
         <Link
           href="/wishlist"
           className="flex items-center gap-3 rounded-lg border border-border bg-surface p-4 text-sm font-medium text-dark transition-colors hover:border-primary"

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { ShoppingCart, Trash2, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import QuantityStepper from "@/components/ui/QuantityStepper";
@@ -118,9 +119,17 @@ export default function CartDrawer() {
                     <p className="font-serif font-semibold text-dark">
                       {item.name}
                     </p>
-                    {item.size && (
+                    {item.size ? (
                       <p className="text-xs text-muted">Size: {item.size}</p>
-                    )}
+                    ) : item.slug ? (
+                      <Link
+                        href={`/products/${item.slug}`}
+                        onClick={closeCart}
+                        className="text-xs font-semibold text-amber-700 underline underline-offset-2"
+                      >
+                        Choose a size
+                      </Link>
+                    ) : null}
                     <p className="text-sm font-medium text-secondary">
                       ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                     </p>
@@ -156,12 +165,14 @@ export default function CartDrawer() {
                   ₹{subtotal.toLocaleString("en-IN")}
                 </span>
               </div>
-              <button
-                type="button"
-                className="mt-4 w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-wider text-surface transition-colors hover:bg-dark"
+              <p className="mt-1 text-xs text-muted">Shipping calculated at checkout.</p>
+              <Link
+                href="/checkout"
+                onClick={closeCart}
+                className="mt-4 block w-full rounded-full bg-primary px-6 py-3 text-center text-sm font-semibold uppercase tracking-wider text-surface transition-colors hover:bg-dark"
               >
                 Checkout
-              </button>
+              </Link>
             </div>
           </>
         )}

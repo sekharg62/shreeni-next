@@ -102,6 +102,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
             <TagList tags={product.tags} />
             <ProductBuyBox
               productId={product.id}
+              slug={product.slug}
               name={product.name}
               image={product.images[0] ?? null}
               price={product.price}

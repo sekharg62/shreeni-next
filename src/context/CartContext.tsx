@@ -4,15 +4,36 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
+
+/** Where the cart is kept between visits (this browser only). */
+const CART_KEY = "shreeni_cart";
+
+function loadCart(): CartItem[] {
+  try {
+    const raw = window.localStorage.getItem(CART_KEY);
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed)
+      ? (parsed as CartItem[]).filter(
+          (i) => i && typeof i.id === "string" && typeof i.price === "number" && i.quantity > 0
+        )
+      : [];
+  } catch {
+    return [];
+  }
+}
 
 export type CartItem = {
   /** Line key: the size (variant) id when a size was chosen, else the product id. */
   id: string;
   productId?: string;
+  /** For links back to the product (e.g. "Choose a size"). */
+  slug?: string;
   variantId?: string;
   /** Shown in the cart, e.g. "Free Size". */
   size?: string;
@@ -27,6 +48,8 @@ export type CartItem = {
 
 type CartContextValue = {
   items: CartItem[];
+  /** false until the saved cart has been read (avoid flashing "empty"). */
+  ready: boolean;
   isOpen: boolean;
   itemCount: number;
   subtotal: number;
@@ -42,7 +65,34 @@ const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [ready, setReady] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const loaded = useRef(false);
+
+  // Read the saved cart after the first render (server HTML has an empty cart).
+  useEffect(() => {
+    void Promise.resolve().then(() => {
+      setItems(loadCart());
+      setReady(true);
+      loaded.current = true;
+    });
+    // Keep tabs in sync.
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === CART_KEY) setItems(loadCart());
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  // Save on every change (after the initial load).
+  useEffect(() => {
+    if (!loaded.current) return;
+    try {
+      window.localStorage.setItem(CART_KEY, JSON.stringify(items));
+    } catch {
+      /* storage full or blocked — cart still works for this visit */
+    }
+  }, [items]);
 
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
@@ -103,6 +153,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const value = useMemo<CartContextValue>(
     () => ({
       items,
+      ready,
       isOpen,
       itemCount,
       subtotal,
@@ -115,6 +166,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }),
     [
       items,
+      ready,
       isOpen,
       itemCount,
       subtotal,
