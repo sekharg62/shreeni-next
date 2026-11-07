@@ -27,11 +27,10 @@ export const navLinks: NavLink[] = [
   },
   {
     label: "About",
-    href: "/about",
+    href: "/about/story",
     items: [
       { label: "Our Story", href: "/about/story" },
       { label: "Craftsmanship", href: "/about/craftsmanship" },
-      { label: "Blog", href: "/blog" },
     ],
   },
   {
