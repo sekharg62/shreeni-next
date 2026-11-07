@@ -6,6 +6,7 @@ import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import { TagList } from "@/components/ui/Tag";
 import ProductGallery from "@/components/product/ProductGallery";
 import ProductBuyBox from "@/components/product/ProductBuyBox";
+import ShareButton from "@/components/product/ShareButton";
 import ProductStory from "@/components/product/ProductStory";
 import ProductDetails from "@/components/product/ProductDetails";
 import RelatedProducts, { RelatedProductsSkeleton } from "@/components/product/RelatedProducts";
@@ -96,7 +97,10 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
 
           <div className="flex flex-col gap-6 lg:sticky lg:top-28 lg:self-start">
             <div>
-              <h1 className="font-serif text-3xl font-semibold leading-tight text-dark sm:text-4xl">{product.name}</h1>
+              <div className="flex items-start justify-between gap-4">
+                <h1 className="font-serif text-3xl font-semibold leading-tight text-dark sm:text-4xl">{product.name}</h1>
+                <ShareButton path={`/products/${product.slug}`} title={product.name} className="mt-0.5" />
+              </div>
               {product.shortDescription && <p className="mt-3 leading-relaxed text-muted">{product.shortDescription}</p>}
             </div>
             <TagList tags={product.tags} />
