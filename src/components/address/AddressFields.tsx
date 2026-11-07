@@ -1,12 +1,24 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import { CircleAlert, CircleCheck, Loader2 } from "lucide-react";
 import Input from "@/components/ui/Input";
 import SearchableSelect from "@/components/ui/SearchableSelect";
 import { INDIAN_STATES } from "@/constants/indianStates";
-import { LABELS, type AddressErrors } from "@/lib/address";
+import { LABELS, pincodeNotFound, pincodeStateMismatch, type AddressErrors } from "@/lib/address";
 import type { AddressInput } from "@/types/address";
+import { pincodeService, type PincodeInfo } from "@/services/pincodeService";
 
 const STATE_OPTIONS = INDIAN_STATES.map((s) => ({ label: s, value: s }));
+const KNOWN_STATES = new Set<string>(INDIAN_STATES);
+
+type Lookup =
+  | { status: "idle" }
+  | { status: "loading"; pincode: string }
+  | { status: "found"; info: PincodeInfo }
+  | { status: "notfound"; pincode: string }
+  /** Couldn't reach the server: let the shopper carry on; the server checks on save. */
+  | { status: "offline" };
 
 type Props = {
   value: AddressInput;
@@ -18,11 +30,80 @@ type Props = {
   hideLabel?: boolean;
 };
 
-/** Delivery address fields. Controlled; validation lives in lib/address. */
+/**
+ * Delivery address fields. Controlled; validation lives in lib/address.
+ * Pincode: checked against India Post's directory once 6 digits are in, and against the chosen
+ * state. Unknown pincode or wrong state → an error that blocks saving. Empty state → filled in.
+ */
 export default function AddressFields({ value, onChange, errors, idPrefix = "addr", hideLabel }: Props) {
   const set = <K extends keyof AddressInput>(key: K, v: AddressInput[K]) => onChange({ ...value, [key]: v });
   const id = (k: string) => `${idPrefix}-${k}`;
   const digits = (s: string, max: number) => s.replace(/\D/g, "").slice(0, max);
+
+  /* ── Pincode verification ── */
+  const [lookup, setLookup] = useState<Lookup>({ status: "idle" });
+  // Latest value/onChange for the async lookup (the shopper may keep typing meanwhile).
+  const latest = useRef({ value, onChange });
+  useEffect(() => {
+    latest.current = { value, onChange };
+  });
+  const pending = useRef<AbortController | null>(null);
+
+  const verify = (pin: string, autofill: boolean) => {
+    pending.current?.abort();
+    if (pin.length < 6) {
+      setLookup({ status: "idle" });
+      return;
+    }
+    const controller = new AbortController();
+    pending.current = controller;
+    setLookup({ status: "loading", pincode: pin });
+    pincodeService.lookup(pin, controller.signal).then(
+      (info) => {
+        if (controller.signal.aborted) return;
+        if (!info) return setLookup({ status: "notfound", pincode: pin });
+        setLookup({ status: "found", info });
+        // Only fill the state when the shopper hasn't picked one; a different pick shows a mismatch.
+        const { value: v, onChange: emit } = latest.current;
+        if (autofill && !v.state && KNOWN_STATES.has(info.state)) emit({ ...v, state: info.state });
+      },
+      () => {
+        if (!controller.signal.aborted) setLookup({ status: "offline" });
+      }
+    );
+  };
+
+  // Editing a saved address: verify its pincode once (without changing what was saved).
+  useEffect(() => {
+    const pin = latest.current.value.pincode;
+    if (/^[1-9]\d{5}$/.test(pin)) void Promise.resolve().then(() => verify(pin, false));
+    return () => pending.current?.abort();
+  }, []);
+
+  const onPincode = (raw: string) => {
+    const pin = digits(raw, 6);
+    set("pincode", pin);
+    verify(pin, true);
+  };
+
+  const found = lookup.status === "found" && lookup.info.pincode === value.pincode ? lookup.info : null;
+  const pinError =
+    errors.pincode ??
+    (lookup.status === "notfound" && lookup.pincode === value.pincode ? pincodeNotFound(value.pincode) : undefined);
+  const stateError =
+    errors.state ??
+    (found && value.state && value.state !== found.state ? pincodeStateMismatch(found.pincode, found.state) : undefined);
+  const stateMatches = !!found && value.state === found.state;
+  const pinHint =
+    lookup.status === "loading" ? "Checking pincode…" : stateMatches ? `Matches ${found.state}` : undefined;
+  const pinIcon =
+    lookup.status === "loading" ? (
+      <Loader2 className="h-4 w-4 animate-spin text-muted" aria-hidden="true" />
+    ) : stateMatches ? (
+      <CircleCheck className="h-4 w-4 text-green-600" aria-label="Pincode matches the state" />
+    ) : pinError || stateError ? (
+      <CircleAlert className="h-4 w-4 text-red-600" aria-hidden="true" />
+    ) : null;
 
   return (
     <div className="space-y-5">
@@ -112,8 +193,11 @@ export default function AddressFields({ value, onChange, errors, idPrefix = "add
           autoComplete="postal-code"
           placeholder="6-digit pincode"
           value={value.pincode}
-          onChange={(e) => set("pincode", digits(e.target.value, 6))}
-          error={errors.pincode}
+          onChange={(e) => onPincode(e.target.value)}
+          error={pinError}
+          hint={pinHint}
+          suffix={pinIcon}
+          aria-busy={lookup.status === "loading"}
         />
         <Input
           id={id("city")}
@@ -135,7 +219,7 @@ export default function AddressFields({ value, onChange, errors, idPrefix = "add
         options={STATE_OPTIONS}
         value={value.state || null}
         onChange={(v) => set("state", v)}
-        error={errors.state}
+        error={stateError}
       />
     </div>
   );

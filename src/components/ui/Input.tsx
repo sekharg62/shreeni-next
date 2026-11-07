@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type InputHTMLAttributes } from "react";
+import { useState, type InputHTMLAttributes, type ReactNode } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
@@ -11,6 +11,8 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   hint?: string;
   /** Optional element rendered inside the field on the left (e.g. a country code). */
   prefix?: string;
+  /** Optional element inside the field on the right (e.g. a status icon). */
+  suffix?: ReactNode;
 };
 
 export default function Input({
@@ -19,6 +21,7 @@ export default function Input({
   error,
   hint,
   prefix,
+  suffix,
   type = "text",
   className = "",
   ...props
@@ -51,6 +54,7 @@ export default function Input({
           className={`w-full bg-transparent px-4 py-3 text-dark outline-none placeholder:text-muted/60 ${className}`}
           {...props}
         />
+        {suffix && <span className="flex items-center pr-3">{suffix}</span>}
         {isPassword && (
           <button
             type="button"

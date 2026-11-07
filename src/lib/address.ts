@@ -1,5 +1,6 @@
 import type { Address, AddressInput, AddressLabel } from "@/types/address";
 import { INDIAN_STATES } from "@/constants/indianStates";
+import { pincodeService } from "@/services/pincodeService";
 
 export const LABELS: { value: AddressLabel; text: string }[] = [
   { value: "HOME", text: "Home" },
@@ -35,8 +36,18 @@ export function validateAddress(a: AddressInput): AddressErrors {
   if (!a.city.trim()) e.city = "Enter the city";
   if (!(INDIAN_STATES as readonly string[]).includes(a.state)) e.state = "Choose a state";
   if (!/^[1-9]\d{5}$/.test(a.pincode)) e.pincode = "Enter a valid 6-digit pincode";
+  else {
+    // Same directory rules as the server, using what the form already looked up.
+    const known = pincodeService.peek(a.pincode);
+    if (known === null) e.pincode = pincodeNotFound(a.pincode);
+    else if (known && !e.state && known.state !== a.state) e.state = pincodeStateMismatch(a.pincode, known.state);
+  }
   return e;
 }
+
+export const pincodeNotFound = (pin: string) => `We couldn't find pincode ${pin}. Please check it.`;
+export const pincodeStateMismatch = (pin: string, state: string) =>
+  `Pincode ${pin} is in ${state}. Please check the pincode or the state.`;
 
 export const emptyAddress = (): AddressInput => ({
   label: "HOME",

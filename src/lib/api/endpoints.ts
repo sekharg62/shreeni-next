@@ -37,6 +37,10 @@ export const ENDPOINTS = {
     /** POST { productIds } — add a guest's items after sign-in; returns the full list */
     merge: "/me/wishlist/merge",
   },
+  pincodes: {
+    /** GET — city, district, state and post offices for a 6-digit PIN (public) */
+    lookup: (pincode: string) => `/pincodes/${encodeURIComponent(pincode)}`,
+  },
   cart: {
     /** GET the signed-in customer's cart · DELETE empties it */
     mine: "/me/cart",
