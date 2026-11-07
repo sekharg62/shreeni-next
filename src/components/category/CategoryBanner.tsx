@@ -21,7 +21,8 @@ export default function CategoryBanner({ name, bannerUrl, posterUrl }: Props) {
   const mobileShape = posterUrl ? "aspect-[4/5]" : "aspect-[8/3]";
   const desktopShape = bannerUrl ? "sm:aspect-[8/3]" : "sm:aspect-[4/5] sm:max-w-md sm:mx-auto";
 
-  const common = { alt: name, fill: true, sizes: "100vw" } as const;
+  // Full width on phones; inside the 1440px content area (minus gutters) from 640px up.
+  const common = { alt: name, fill: true, sizes: "(min-width: 1440px) 1376px, 100vw" } as const;
   const {
     props: { srcSet: desktop },
   } = getImageProps({ ...common, src: desktopSrc });
@@ -30,7 +31,7 @@ export default function CategoryBanner({ name, bannerUrl, posterUrl }: Props) {
   } = getImageProps({ ...common, src: mobileSrc });
 
   return (
-    <div className={`relative w-full overflow-hidden bg-background ${mobileShape} ${desktopShape} sm:max-h-[70vh]`}>
+    <div className={`relative w-full overflow-hidden bg-background sm:rounded-lg ${mobileShape} ${desktopShape} sm:max-h-[70vh]`}>
       <picture>
         <source media="(min-width: 640px)" srcSet={desktop} />
         {/* eslint-disable-next-line jsx-a11y/alt-text -- alt comes from getImageProps */}

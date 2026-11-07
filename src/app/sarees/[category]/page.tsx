@@ -60,7 +60,8 @@ export default async function CategoryPage({ params, searchParams }: PageProps<"
         <Breadcrumb items={crumbsFor(category)} />
       </Container>
 
-      <div className="mt-4 sm:mt-6">
+      {/* Phones: edge to edge. Tablet/desktop: lined up with the breadcrumb and grid (same gutters as <Container>). */}
+      <div className="mt-4 sm:mx-auto sm:mt-6 sm:max-w-[1440px] sm:px-6 lg:px-8">
         <CategoryBanner name={category.name} bannerUrl={category.bannerUrl} posterUrl={category.posterUrl} />
       </div>
 
