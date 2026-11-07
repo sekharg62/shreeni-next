@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { Fraunces, Outfit } from "next/font/google";
 import "./globals.css";
 import AnnouncementBar from "@/components/AnnouncementBar";
@@ -62,13 +63,29 @@ export const viewport: Viewport = {
   themeColor: "#650f25",
 };
 
+/** Tag Manager runs on production builds only, so local development doesn't pollute analytics. */
+const GTM_ID = process.env.NODE_ENV === "production" ? siteConfig.analytics.gtmId : "";
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en-IN"
       className={`${fraunces.variable} ${outfit.variable} h-full antialiased`}
     >
+      {GTM_ID && <GoogleTagManager gtmId={GTM_ID} />}
       <body className="flex min-h-full flex-col bg-background text-dark">
+        {GTM_ID && (
+          // Google's fallback for visitors with JavaScript turned off.
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+              title="Google Tag Manager"
+            />
+          </noscript>
+        )}
         <ToastProvider>
         <AuthProvider>
         <CartProvider>

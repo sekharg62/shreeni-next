@@ -44,6 +44,12 @@ export const siteConfig = {
     googleSiteVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
   },
 
+  // --- Analytics ---
+  analytics: {
+    /** Google Tag Manager container. Override with NEXT_PUBLIC_GTM_ID; set it to "" to turn tracking off. */
+    gtmId: process.env.NEXT_PUBLIC_GTM_ID ?? "GTM-TBLCPRBT",
+  },
+
   // --- Contact info ---
   contact: {
     email: "support@shreeni.example.com",
