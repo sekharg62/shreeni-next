@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Search, User } from "lucide-react";
+import { Search } from "lucide-react";
+import AccountButton from "./AccountButton";
 import { siteConfig } from "@/config/siteConfig";
 import { navLinks } from "@/config/nav";
 import MobileMenu from "@/components/MobileMenu";
@@ -68,13 +69,7 @@ export default function Header() {
             <Search className="h-6 w-6" strokeWidth={1.8} aria-hidden="true" />
           </Link>
 
-          <Link
-            href="/account"
-            aria-label="Account"
-            className="rounded-full p-2 text-dark transition-colors hover:bg-background hover:text-primary"
-          >
-            <User className="h-6 w-6" strokeWidth={1.8} aria-hidden="true" />
-          </Link>
+          <AccountButton />
 
           <WishlistButton />
 

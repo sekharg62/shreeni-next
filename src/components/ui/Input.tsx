@@ -7,6 +7,8 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
   id: string;
   error?: string;
+  /** Helper text under the field (hidden while an error shows). */
+  hint?: string;
   /** Optional element rendered inside the field on the left (e.g. a country code). */
   prefix?: string;
 };
@@ -15,6 +17,7 @@ export default function Input({
   label,
   id,
   error,
+  hint,
   prefix,
   type = "text",
   className = "",
@@ -23,13 +26,18 @@ export default function Input({
   const [show, setShow] = useState(false);
   const isPassword = type === "password";
   const inputType = isPassword && show ? "text" : type;
+  const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined;
 
   return (
     <div className="w-full">
       <label htmlFor={id} className="mb-2 block text-sm font-medium text-dark">
         {label}
       </label>
-      <div className="flex items-stretch overflow-hidden rounded-md border border-border bg-surface transition-colors focus-within:border-primary">
+      <div
+        className={`flex items-stretch overflow-hidden rounded-md border bg-surface transition-colors ${
+          error ? "border-red-500 focus-within:border-red-600" : "border-border focus-within:border-primary"
+        }`}
+      >
         {prefix && (
           <span className="flex items-center whitespace-nowrap border-r border-border bg-background px-3 text-sm text-muted">
             {prefix}
@@ -38,6 +46,8 @@ export default function Input({
         <input
           id={id}
           type={inputType}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy}
           className={`w-full bg-transparent px-4 py-3 text-dark outline-none placeholder:text-muted/60 ${className}`}
           {...props}
         />
@@ -56,7 +66,15 @@ export default function Input({
           </button>
         )}
       </div>
-      {error && <p className="mt-1.5 text-sm text-red-600">{error}</p>}
+      {error ? (
+        <p id={`${id}-error`} className="mt-1.5 text-sm text-red-600">
+          {error}
+        </p>
+      ) : hint ? (
+        <p id={`${id}-hint`} className="mt-1.5 text-xs text-muted">
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }

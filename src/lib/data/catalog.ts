@@ -1,10 +1,12 @@
 // Cached catalogue reads for Server Components. Each function is one cache entry
 // per argument set; tags let the admin refresh them on demand.
 import { cacheLife, cacheTag } from "next/cache";
-import { CACHE_TAGS, CATEGORY_SLUGS, PRODUCTS_PER_PAGE, RELATED_PRODUCTS_LIMIT } from "@/config/constants";
+import { CACHE_TAGS, CATEGORY_SLUGS, PRODUCTS_PER_PAGE, RELATED_PRODUCTS_LIMIT, REVIEWS_PER_PAGE } from "@/config/constants";
 import { getApiErrorStatus } from "@/lib/api";
 import { categoryService } from "@/services/categoryService";
 import { productService } from "@/services/productService";
+import { reviewService } from "@/services/reviewService";
+import type { ReviewListResponse } from "@/types/review";
 import type { CategoryDetail } from "@/types/category";
 import type { ProductCardItem, ProductCardPage, ProductDetail } from "@/types/product";
 
@@ -89,5 +91,19 @@ export async function getPrerenderProductSlugs(): Promise<string[]> {
   } catch {
     cacheLife("seconds");
     return [];
+  }
+}
+
+/** First page of approved reviews + summary; null if unavailable (the section shows a fallback). */
+export async function getProductReviews(slug: string): Promise<ReviewListResponse | null> {
+  "use cache";
+  cacheTag(CACHE_TAGS.reviews);
+  try {
+    const page = await reviewService.list(slug, { page: 1, limit: REVIEWS_PER_PAGE });
+    cacheLife("minutes"); // newly approved reviews show within about a minute
+    return page;
+  } catch {
+    cacheLife("seconds");
+    return null;
   }
 }

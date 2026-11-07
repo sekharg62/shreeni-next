@@ -15,7 +15,16 @@ export const ENDPOINTS = {
     /** ?limit= (1–12) */
     related: (slug: string) => `/products/${encodeURIComponent(slug)}/related`,
   },
+  reviews: {
+    /** GET ?page=&limit= (approved only) · POST (signed-in customer) */
+    list: (slug: string) => `/products/${encodeURIComponent(slug)}/reviews`,
+    /** GET — the signed-in customer's own review */
+    mine: (slug: string) => `/products/${encodeURIComponent(slug)}/reviews/mine`,
+  },
   auth: {
+    register: "/auth/register",
+    /** customers only — the admin panel uses /admin/auth/login */
     login: "/auth/login",
+    me: "/auth/me",
   },
 } as const;

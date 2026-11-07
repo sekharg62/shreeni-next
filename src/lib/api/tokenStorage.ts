@@ -2,7 +2,8 @@
 // Every function is safe to call on the server (there is no token there) and
 // survives storage being blocked (private mode, disabled site data).
 
-export const AUTH_TOKEN_KEY = "shreeni_auth_token";
+// Separate from the admin panel's "shreeni_admin_token".
+export const AUTH_TOKEN_KEY = "shreeni_customer_token";
 
 /** Fired on `window` when the backend rejects the token (expired / revoked). */
 export const AUTH_EXPIRED_EVENT = "shreeni:auth-expired";

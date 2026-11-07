@@ -10,6 +10,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { ToastProvider } from "@/context/ToastContext";
+import { AuthProvider } from "@/context/AuthContext";
 import { siteConfig } from "@/config/siteConfig";
 
 // Elegant serif for headings / display
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col bg-background text-dark">
         <ToastProvider>
+        <AuthProvider>
         <CartProvider>
           <WishlistProvider>
             <AnnouncementBar />
@@ -55,6 +57,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <BackToTop />
           </WishlistProvider>
         </CartProvider>
+        </AuthProvider>
         </ToastProvider>
       </body>
     </html>

@@ -30,7 +30,8 @@ export default function AutoHeight({
   return (
     <div
       style={{ height }}
-      className={`overflow-hidden transition-[height] duration-300 ease-out ${className}`}
+      // overflow: clip (not hidden) — a hidden box can be scrolled by focusing a field inside it mid-animation.
+      className={`overflow-clip transition-[height] duration-300 ease-out motion-reduce:transition-none ${className}`}
     >
       <div ref={inner}>{children}</div>
     </div>

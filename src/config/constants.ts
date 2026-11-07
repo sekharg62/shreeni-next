@@ -8,6 +8,7 @@ export const CACHE_TAGS = {
   banners: "banners",
   categories: "categories",
   products: "products",
+  reviews: "reviews",
 } as const;
 
 export type CacheTag = (typeof CACHE_TAGS)[keyof typeof CACHE_TAGS];
@@ -23,3 +24,6 @@ export const PRODUCTS_PER_PAGE = 24;
 
 /** How many related products the product page shows (backend allows up to 12). */
 export const RELATED_PRODUCTS_LIMIT = 8;
+
+/** Reviews per page on the product page (backend allows up to 20). */
+export const REVIEWS_PER_PAGE = 5;

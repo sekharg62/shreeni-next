@@ -9,6 +9,7 @@ import ProductBuyBox from "@/components/product/ProductBuyBox";
 import ProductStory from "@/components/product/ProductStory";
 import ProductDetails from "@/components/product/ProductDetails";
 import RelatedProducts, { RelatedProductsSkeleton } from "@/components/product/RelatedProducts";
+import ProductReviews, { ProductReviewsSkeleton } from "@/components/product/ProductReviews";
 import { env } from "@/config/env";
 import { getPrerenderProductSlugs, getProduct } from "@/lib/data/catalog";
 import type { ProductDetail } from "@/types/product";
@@ -115,7 +116,12 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
         <ProductStory story={product.story} />
         <ProductDetails product={product} />
 
-        {/* Second API call: streams in after the product */}
+        {/* Third API call: approved reviews, streams in after the product */}
+        <Suspense fallback={<ProductReviewsSkeleton />}>
+          <ProductReviews slug={product.slug} productName={product.name} />
+        </Suspense>
+
+        {/* Related products: streams in after the product */}
         <Suspense fallback={<RelatedProductsSkeleton />}>
           <RelatedProducts slug={product.slug} />
         </Suspense>

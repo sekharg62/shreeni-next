@@ -7,17 +7,16 @@ import { ChevronDown } from "lucide-react";
 import { navLinks } from "@/config/nav";
 import { siteConfig } from "@/config/siteConfig";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 
-const quickLinks = [
-  { label: "Search", href: "/search" },
-  { label: "Account", href: "/account" },
-];
+const quickLinks = [{ label: "Search", href: "/search" }];
 
 export default function MobileMenu() {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   const { openCart, itemCount } = useCart();
+  const { status, displayName } = useAuth();
 
   useEffect(() => setMounted(true), []);
 
@@ -162,6 +161,13 @@ export default function MobileMenu() {
                     {link.label}
                   </Link>
                 ))}
+                <Link
+                  href="/account"
+                  onClick={close}
+                  className="text-sm uppercase tracking-wider text-surface/80 transition-colors hover:text-secondary"
+                >
+                  {status === "signed-in" && displayName ? `Hi, ${displayName}` : "Sign in"}
+                </Link>
                 <button
                   type="button"
                   onClick={() => {
