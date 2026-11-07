@@ -118,6 +118,9 @@ export default function CartDrawer() {
                     <p className="font-serif font-semibold text-dark">
                       {item.name}
                     </p>
+                    {item.size && (
+                      <p className="text-xs text-muted">Size: {item.size}</p>
+                    )}
                     <p className="text-sm font-medium text-secondary">
                       ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                     </p>
@@ -128,6 +131,7 @@ export default function CartDrawer() {
                         value={item.quantity}
                         onChange={(next) => updateQuantity(item.id, next)}
                         min={1}
+                        max={item.maxQuantity}
                         size="sm"
                       />
                     </div>

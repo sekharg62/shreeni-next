@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Heart, ShoppingCart } from "lucide-react";
 import type { ProductCardItem } from "@/types/product";
 import { formatINR } from "@/lib/format";
@@ -14,6 +15,7 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
   const toast = useToast();
   const wishlisted = isWishlisted(product.id);
   const outOfStock = product.inStock === false;
+  const href = product.slug ? `/products/${product.slug}` : null;
 
   const cartPayload = {
     id: product.id,
@@ -44,6 +46,10 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
   return (
     <div className="group flex flex-col overflow-hidden rounded-md border border-border bg-surface">
       <div className="relative aspect-[3/4] overflow-hidden">
+        {/* Whole photo opens the product (skipped by keyboard: the name link below does the same). */}
+        {href && (
+          <Link href={href} tabIndex={-1} aria-hidden="true" className="absolute inset-0 z-[1]" />
+        )}
         {product.image ? (
           <Image
             src={product.image}
@@ -67,7 +73,7 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
 
         {/* Out of stock badge */}
         {outOfStock && (
-          <span className="absolute left-3 top-3 rounded-full bg-dark/85 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-surface">
+          <span className="absolute left-3 top-3 z-[2] rounded-full bg-dark/85 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-surface">
             Out of Stock
           </span>
         )}
@@ -78,7 +84,7 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
           onClick={toggleWishlist}
           aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           aria-pressed={wishlisted}
-          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-surface/90 text-dark shadow-sm backdrop-blur transition-colors hover:text-red-500"
+          className="absolute right-3 top-3 z-[2] flex h-9 w-9 items-center justify-center rounded-full bg-surface/90 text-dark shadow-sm backdrop-blur transition-colors hover:text-red-500"
         >
           <Heart
             className={`h-5 w-5 transition-colors ${
@@ -91,7 +97,13 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
 
       <div className="flex flex-1 flex-col p-4">
         <h3 className="font-serif text-lg font-semibold text-dark">
-          {product.name}
+          {href ? (
+            <Link href={href} className="transition-colors hover:text-primary">
+              {product.name}
+            </Link>
+          ) : (
+            product.name
+          )}
         </h3>
         <p className="mt-1 flex flex-wrap items-baseline gap-x-2 text-sm">
           <span className="font-medium text-secondary">

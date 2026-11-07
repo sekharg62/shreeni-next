@@ -41,3 +41,81 @@ export type ProductCardPage = {
   items: ProductCardItem[];
   meta: PageMeta;
 };
+
+/* ───────────── Product page ───────────── */
+
+/** A size as the API sends it (prices in paise). */
+export type ProductVariantDto = {
+  id: string;
+  size: string;
+  price: number;
+  compareAtPrice: number | null;
+  /** 0 = sold out; capped at 10 by the API. */
+  available: number;
+};
+
+export type ProductTag = { name: string; slug: string; color: string | null };
+
+export type ProductColor = { type: "PRIMARY" | "SECONDARY"; name: string; hexCode: string | null };
+
+export type ProductSpec = { label: string; value: string };
+
+export type ProductFacts = {
+  fabric: string | null;
+  lengthCm: number | null;
+  widthCm: number | null;
+  blousePiece: boolean;
+  blousePieceInfo: string | null;
+  washCare: string | null;
+};
+
+export type ProductMaker = {
+  countryOfOrigin: string | null;
+  manufacturedBy: string | null;
+  manufacturerAddress: string | null;
+};
+
+/** Breadcrumb step; `slug` null = that category isn't published (not linkable). */
+export type ProductCrumb = { name: string; slug: string | null };
+
+/** `GET /products/:slug` response body (prices in paise). */
+export type ProductDetailResponse = {
+  id: string;
+  name: string;
+  slug: string;
+  shortDescription: string | null;
+  description: string;
+  story: string | null;
+  price: number;
+  compareAtPrice: number | null;
+  images: { url: string }[];
+  variants: ProductVariantDto[];
+  tags: ProductTag[];
+  colors: ProductColor[];
+  facts: ProductFacts;
+  specifications: { details: ProductSpec[]; manufacturing: ProductSpec[] };
+  maker: ProductMaker;
+  breadcrumb: ProductCrumb[];
+};
+
+/** A size, ready for the UI (prices in rupees). */
+export type ProductVariant = Omit<ProductVariantDto, "price" | "compareAtPrice"> & {
+  price: number;
+  compareAtPrice: number | null;
+};
+
+/** The product page model (prices in rupees, image URLs flattened). */
+export type ProductDetail = Omit<ProductDetailResponse, "price" | "compareAtPrice" | "images" | "variants"> & {
+  price: number;
+  compareAtPrice: number | null;
+  images: string[];
+  variants: ProductVariant[];
+  /** Any size can be ordered right now. */
+  inStock: boolean;
+};
+
+/** Query for `GET /products/:slug/related`. */
+export type RelatedProductsParams = { limit?: number };
+
+/** `GET /products/:slug/related` response body. */
+export type RelatedProductsResponse = ProductCardDto[];

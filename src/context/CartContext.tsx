@@ -10,7 +10,14 @@ import {
 } from "react";
 
 export type CartItem = {
+  /** Line key: the size (variant) id when a size was chosen, else the product id. */
   id: string;
+  productId?: string;
+  variantId?: string;
+  /** Shown in the cart, e.g. "Free Size". */
+  size?: string;
+  /** Most that can be ordered (stock, capped). */
+  maxQuantity?: number;
   name: string;
   price: number;
   /** null when the product has no photo yet */
@@ -43,13 +50,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addItem = useCallback(
     (item: Omit<CartItem, "quantity">, quantity = 1) => {
       setItems((prev) => {
+        const cap = (q: number) =>
+          item.maxQuantity !== undefined ? Math.min(q, item.maxQuantity) : q;
         const existing = prev.find((i) => i.id === item.id);
         if (existing) {
           return prev.map((i) =>
-            i.id === item.id ? { ...i, quantity: i.quantity + quantity } : i
+            i.id === item.id
+              ? { ...i, ...item, quantity: cap(i.quantity + quantity) }
+              : i
           );
         }
-        return [...prev, { ...item, quantity }];
+        return [...prev, { ...item, quantity: cap(quantity) }];
       });
       setIsOpen(true);
     },
@@ -64,7 +75,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((prev) =>
       quantity <= 0
         ? prev.filter((i) => i.id !== id)
-        : prev.map((i) => (i.id === id ? { ...i, quantity } : i))
+        : prev.map((i) =>
+            i.id === id
+              ? {
+                  ...i,
+                  quantity:
+                    i.maxQuantity !== undefined
+                      ? Math.min(quantity, i.maxQuantity)
+                      : quantity,
+                }
+              : i
+          )
     );
   }, []);
 

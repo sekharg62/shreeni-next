@@ -20,3 +20,6 @@ export const CATEGORY_SLUGS = {
 
 /** Products per page on listing pages (backend allows up to 48). */
 export const PRODUCTS_PER_PAGE = 24;
+
+/** How many related products the product page shows (backend allows up to 12). */
+export const RELATED_PRODUCTS_LIMIT = 8;

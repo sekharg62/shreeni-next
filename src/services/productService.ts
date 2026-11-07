@@ -1,7 +1,19 @@
 import { apiClient } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { paiseToRupees } from "@/lib/format";
-import type { ProductCardDto, ProductCardItem, ProductCardPage, ProductListParams, ProductListResponse } from "@/types/product";
+import type {
+  ProductCardDto,
+  ProductCardItem,
+  ProductCardPage,
+  ProductDetail,
+  ProductDetailResponse,
+  ProductListParams,
+  ProductListResponse,
+  RelatedProductsParams,
+  RelatedProductsResponse,
+} from "@/types/product";
+
+const money = (paise: number | null) => (paise === null ? null : paiseToRupees(paise));
 
 /** API card (paise) → UI card (rupees). */
 export function toProductCardItem(p: ProductCardDto): ProductCardItem {
@@ -10,8 +22,28 @@ export function toProductCardItem(p: ProductCardDto): ProductCardItem {
     name: p.name,
     slug: p.slug,
     price: paiseToRupees(p.price),
-    compareAtPrice: p.compareAtPrice === null ? null : paiseToRupees(p.compareAtPrice),
+    compareAtPrice: money(p.compareAtPrice),
     image: p.imageUrl,
+  };
+}
+
+/** API product (paise) → page model (rupees). */
+export function toProductDetail(p: ProductDetailResponse): ProductDetail {
+  const variants = (p.variants ?? []).map((v) => ({
+    ...v,
+    price: paiseToRupees(v.price),
+    compareAtPrice: money(v.compareAtPrice),
+  }));
+  return {
+    ...p,
+    price: paiseToRupees(p.price),
+    compareAtPrice: money(p.compareAtPrice),
+    images: (p.images ?? []).map((i) => i.url).filter(Boolean),
+    variants,
+    tags: p.tags ?? [],
+    colors: p.colors ?? [],
+    breadcrumb: p.breadcrumb ?? [],
+    inStock: variants.some((v) => v.available > 0),
   };
 }
 
@@ -23,5 +55,17 @@ export const productService = {
       items: Array.isArray(data?.data) ? data.data.map(toProductCardItem) : [],
       meta: data.meta,
     };
+  },
+
+  /** One published product for its page (everything except related). Public. 404 if missing. */
+  async detail(slug: string): Promise<ProductDetail> {
+    const { data } = await apiClient.get<ProductDetailResponse>(ENDPOINTS.products.detail(slug));
+    return toProductDetail(data);
+  },
+
+  /** Related cards: admin picks first, topped up from the same category. Public. */
+  async related(slug: string, params: RelatedProductsParams = {}): Promise<ProductCardItem[]> {
+    const { data } = await apiClient.get<RelatedProductsResponse>(ENDPOINTS.products.related(slug), { params });
+    return Array.isArray(data) ? data.map(toProductCardItem) : [];
   },
 };
