@@ -47,7 +47,7 @@ export const siteConfig = {
   // --- Analytics ---
   analytics: {
     /** Google Tag Manager container. Override with NEXT_PUBLIC_GTM_ID; set it to "" to turn tracking off. */
-    gtmId: process.env.NEXT_PUBLIC_GTM_ID ?? "GTM-TBLCPRBT",
+    gtmId: process.env.NEXT_PUBLIC_GTM_ID ?? "GTM-TNSC4GRW",
   },
 
   // --- Contact info ---
