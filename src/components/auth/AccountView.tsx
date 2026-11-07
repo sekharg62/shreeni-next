@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Heart, LogOut, Mail, Package, Phone, User } from "lucide-react";
+import { Heart, LifeBuoy, LogOut, Mail, Package, Phone, User } from "lucide-react";
 import AuthForm, { type AuthMode } from "./AuthForm";
 import AddressBook from "@/components/address/AddressBook";
 import { useAuth } from "@/context/AuthContext";
@@ -115,7 +115,7 @@ export default function AccountView() {
         />
       </section>
 
-      <div className="mt-8 grid gap-3 sm:grid-cols-2">
+      <div className="mt-8 grid gap-3 sm:grid-cols-3">
         <Link
           href="/wishlist"
           className="flex items-center gap-3 rounded-lg border border-border bg-surface p-4 text-sm font-medium text-dark transition-colors hover:border-primary"
@@ -127,6 +127,12 @@ export default function AccountView() {
           className="flex items-center gap-3 rounded-lg border border-border bg-surface p-4 text-sm font-medium text-dark transition-colors hover:border-primary"
         >
           <Package className="h-5 w-5 text-primary" aria-hidden="true" /> Track an order
+        </Link>
+        <Link
+          href="/account/support"
+          className="flex items-center gap-3 rounded-lg border border-border bg-surface p-4 text-sm font-medium text-dark transition-colors hover:border-primary"
+        >
+          <LifeBuoy className="h-5 w-5 text-primary" aria-hidden="true" /> Help &amp; support
         </Link>
       </div>
 

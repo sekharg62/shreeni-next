@@ -37,6 +37,15 @@ export const ENDPOINTS = {
     /** POST { productIds } — add a guest's items after sign-in; returns the full list */
     merge: "/me/wishlist/merge",
   },
+  support: {
+    /** GET ?page=&limit= · POST { reason, description } (signed-in customer) */
+    list: "/me/support-tickets",
+    one: (id: string) => `/me/support-tickets/${encodeURIComponent(id)}`,
+    /** POST { body } */
+    messages: (id: string) => `/me/support-tickets/${encodeURIComponent(id)}/messages`,
+    /** PATCH */
+    close: (id: string) => `/me/support-tickets/${encodeURIComponent(id)}/close`,
+  },
   auth: {
     register: "/auth/register",
     /** customers only — the admin panel uses /admin/auth/login */
