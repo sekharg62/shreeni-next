@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/siteConfig";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Track Order",
   description: `Track your ${siteConfig.name} order and check delivery status.`,
-};
+  path: "/track",
+});
 
 export default function TrackOrderPage() {
   return (

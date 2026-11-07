@@ -107,3 +107,30 @@ export async function getProductReviews(slug: string): Promise<ReviewListRespons
     return null;
   }
 }
+
+/** Everything the sitemap lists: every published sub-category and every product in them (all pages). */
+export async function getSitemapCatalog(): Promise<{
+  categories: string[];
+  products: { slug: string; image: string | null }[];
+}> {
+  "use cache";
+  cacheTag(CACHE_TAGS.products, CACHE_TAGS.categories);
+  try {
+    const categories = await getPrerenderCategorySlugs();
+    const products = new Map<string, string | null>();
+    for (const category of categories) {
+      // Largest page the API allows, so big categories take few requests.
+      for (let page = 1, totalPages = 1; page <= totalPages && page <= 100; page++) {
+        const res = await productService.list({ category, page, limit: 48 }).catch(() => null);
+        if (!res) break;
+        totalPages = res.meta.totalPages;
+        for (const p of res.items) if (p.slug && !products.has(p.slug)) products.set(p.slug, p.image);
+      }
+    }
+    cacheLife("hours");
+    return { categories, products: [...products].map(([slug, image]) => ({ slug, image })) };
+  } catch {
+    cacheLife("seconds");
+    return { categories: [], products: [] };
+  }
+}

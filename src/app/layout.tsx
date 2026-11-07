@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Outfit } from "next/font/google";
 import "./globals.css";
 import AnnouncementBar from "@/components/AnnouncementBar";
@@ -10,6 +10,7 @@ import { WishlistProvider } from "@/context/WishlistContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { siteConfig } from "@/config/siteConfig";
+import { DEFAULT_OG_IMAGE } from "@/lib/seo";
 
 // Elegant serif for headings / display
 const fraunces = Fraunces({
@@ -26,19 +27,45 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: siteConfig.seo.defaultTitle,
     template: siteConfig.seo.titleTemplate,
   },
   description: siteConfig.description,
+  applicationName: siteConfig.name,
   keywords: [...siteConfig.seo.keywords],
-  metadataBase: new URL(siteConfig.url),
+  creator: siteConfig.legalName,
+  publisher: siteConfig.legalName,
+  category: "shopping",
+  // Each page sets its own canonical URL + Open Graph via lib/seo `pageMetadata` (metadata merges shallowly).
+  openGraph: {
+    type: "website",
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
+    images: [DEFAULT_OG_IMAGE],
+  },
+  twitter: { card: "summary_large_image", images: [DEFAULT_OG_IMAGE.url] },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+  },
+  ...(siteConfig.seo.googleSiteVerification && {
+    verification: { google: siteConfig.seo.googleSiteVerification },
+  }),
+  // Phone numbers on the page are links already; stop iOS auto-linking other digits.
+  formatDetection: { telephone: false },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#650f25",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="en-IN"
       className={`${fraunces.variable} ${outfit.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-background text-dark">

@@ -17,11 +17,13 @@ import {
 import Container from "@/components/Container";
 import { siteConfig } from "@/config/siteConfig";
 import { telHref, whatsappHref } from "@/lib/contact";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Help Center",
   description: `Get help with your ${siteConfig.name} order — call, WhatsApp or email us, track an order, or read about shipping and returns.`,
-};
+  path: "/contact/help",
+});
 
 const { contact } = siteConfig;
 

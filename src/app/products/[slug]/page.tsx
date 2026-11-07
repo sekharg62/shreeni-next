@@ -11,9 +11,11 @@ import ProductStory from "@/components/product/ProductStory";
 import ProductDetails from "@/components/product/ProductDetails";
 import RelatedProducts, { RelatedProductsSkeleton } from "@/components/product/RelatedProducts";
 import ProductReviews, { ProductReviewsSkeleton } from "@/components/product/ProductReviews";
-import { env } from "@/config/env";
-import { getPrerenderProductSlugs, getProduct } from "@/lib/data/catalog";
+import { siteConfig } from "@/config/siteConfig";
+import { getPrerenderProductSlugs, getProduct, getProductReviews } from "@/lib/data/catalog";
+import { absoluteUrl, pageMetadata, snippet } from "@/lib/seo";
 import type { ProductDetail } from "@/types/product";
+import type { ReviewSummary } from "@/types/review";
 
 /** Sentinel used only when the backend is unreachable at build time. */
 const PLACEHOLDER = "__placeholder__";
@@ -32,17 +34,12 @@ export async function generateMetadata({ params }: PageProps<"/products/[slug]">
   const { slug } = await params;
   const product = await loadProduct(slug);
   if (!product) return { title: "Not Found" };
-  const description = product.shortDescription ?? product.description.slice(0, 160);
-  return {
+  return pageMetadata({
     title: product.name,
-    description,
-    alternates: { canonical: `/products/${product.slug}` },
-    openGraph: {
-      title: product.name,
-      description,
-      ...(product.images[0] && { images: [{ url: product.images[0] }] }),
-    },
-  };
+    description: snippet(product.shortDescription ?? product.description),
+    path: `/products/${product.slug}`,
+    images: product.images.slice(0, 4),
+  });
 }
 
 function crumbsFor(product: ProductDetail): Crumb[] {
@@ -53,23 +50,36 @@ function crumbsFor(product: ProductDetail): Crumb[] {
   ];
 }
 
-/** schema.org Product, so search results can show price and availability. */
-function productJsonLd(product: ProductDetail) {
+/** schema.org Product, so search results can show price, availability and star rating. */
+function productJsonLd(product: ProductDetail, reviews: ReviewSummary | null) {
+  const url = absoluteUrl(`/products/${product.slug}`);
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
     description: product.shortDescription ?? product.description,
     image: product.images,
-    url: new URL(`/products/${product.slug}`, env.siteUrl).toString(),
-    brand: { "@type": "Brand", name: "Shreeni" },
+    url,
+    brand: { "@type": "Brand", name: siteConfig.name },
     ...(product.maker.countryOfOrigin && { countryOfOrigin: product.maker.countryOfOrigin }),
+    ...(reviews &&
+      reviews.count > 0 && {
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: reviews.average,
+          reviewCount: reviews.count,
+          bestRating: 5,
+          worstRating: 1,
+        },
+      }),
     offers: {
       "@type": "Offer",
+      url,
       priceCurrency: "INR",
       price: product.price.toFixed(2),
+      itemCondition: "https://schema.org/NewCondition",
       availability: product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      url: new URL(`/products/${product.slug}`, env.siteUrl).toString(),
+      seller: { "@type": "Organization", name: siteConfig.name },
     },
   };
 }
@@ -78,12 +88,14 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
   const { slug } = await params;
   const product = await loadProduct(slug);
   if (!product) notFound();
+  // Cached (shared with the reviews section); null when reviews can't be loaded.
+  const reviews = await getProductReviews(product.slug);
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product)).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product, reviews?.summary ?? null)).replace(/</g, "\\u003c") }}
       />
 
       <Container className="pt-6 sm:pt-8">

@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/siteConfig";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Privacy Policy",
   description: `How ${siteConfig.name} collects, uses, and protects your personal information.`,
-};
+  path: "/privacy",
+});
 
 const lastUpdated = "1 November 2026";
 

@@ -16,7 +16,7 @@ export const siteConfig = {
   legalName: "Shreeni Sarees Pvt. Ltd.",
   tagline: "Timeless sarees, woven for every occasion",
   description:
-    "Shop handpicked silk, cotton, and designer sarees online. Authentic weaves, elegant drapes, and fast delivery across India.",
+    "Shop handwoven Bengal sarees online — Baluchori, Jamdani, Tant, Kantha and pure silks, chosen from weavers across Bengal. Delivered across India.",
   url: env.siteUrl,
   apiBaseUrl: env.apiBaseUrl,
   locale: "en_IN",
@@ -24,19 +24,24 @@ export const siteConfig = {
   // --- SEO ---
   seo: {
     titleTemplate: "%s | Shreeni Sarees",
-    defaultTitle: "Shreeni Sarees — Buy Silk, Cotton & Designer Sarees Online",
+    defaultTitle: "Shreeni Sarees — Handwoven Bengal Sarees Online",
     keywords: [
       "sarees",
-      "silk sarees",
-      "cotton sarees",
-      "designer sarees",
-      "kanjivaram",
-      "banarasi saree",
       "buy sarees online",
+      "handloom sarees",
+      "Bengal sarees",
+      "Baluchori saree",
+      "Swarnachori saree",
+      "Jamdani saree",
+      "Tant saree",
+      "Kantha stitch saree",
+      "Murshidabad silk saree",
+      "Bishnupuri silk saree",
+      "silk sarees",
       "wedding sarees",
     ],
-    ogImage: "/og-image.jpg",
-    twitterHandle: "@shreeni",
+    /** Optional: Google Search Console verification token (NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION). */
+    googleSiteVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
   },
 
   // --- Contact info ---

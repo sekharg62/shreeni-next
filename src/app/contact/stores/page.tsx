@@ -3,13 +3,15 @@ import { Clock, MapPin, MessageCircle, Navigation, Phone } from "lucide-react";
 import Container from "@/components/Container";
 import { siteConfig } from "@/config/siteConfig";
 import { fullAddress, telHref, whatsappHref } from "@/lib/contact";
+import { pageMetadata } from "@/lib/seo";
 
 const { location, contact } = siteConfig;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Store Locator",
   description: `Visit the ${siteConfig.name} store in ${location.city}, ${location.state} — address, opening hours, phone and directions.`,
-};
+  path: "/contact/stores",
+});
 
 // Keyless Google Maps embed of the store address.
 const MAP_EMBED = `https://maps.google.com/maps?q=${encodeURIComponent(fullAddress())}&z=16&output=embed`;

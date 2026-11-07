@@ -4,13 +4,15 @@ import { CheckCircle2, Clock, MessageCircle, Package, ShoppingBag, Sparkles, Use
 import Container from "@/components/Container";
 import { siteConfig } from "@/config/siteConfig";
 import { whatsappHref } from "@/lib/contact";
+import { pageMetadata } from "@/lib/seo";
 
 const { contact } = siteConfig;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "WhatsApp Us",
   description: `Chat with ${siteConfig.name} on WhatsApp for help choosing a saree, order updates, and more.`,
-};
+  path: "/contact/whatsapp",
+});
 
 /** Tap one and WhatsApp opens with the message already typed. */
 const STARTERS = [

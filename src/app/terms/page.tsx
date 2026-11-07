@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/siteConfig";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Terms of Service",
   description: `The terms and conditions governing your use of ${siteConfig.name}.`,
-};
+  path: "/terms",
+});
 
 const lastUpdated = "1 November 2026";
 

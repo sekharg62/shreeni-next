@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ProductGrid from "@/components/ProductGrid";
+import { pageMetadata } from "@/lib/seo";
 import {
   collections,
   getCollection,
@@ -18,7 +19,8 @@ export async function generateMetadata({
   const { slug } = await params;
   const col = getCollection(slug);
   if (!col) return { title: "Not Found" };
-  return { title: col.name, description: col.description };
+  // Collections still use placeholder demo products: keep them out of search until they're real.
+  return pageMetadata({ title: col.name, description: col.description, path: `/collections/${col.slug}`, noIndex: true });
 }
 
 export default async function CollectionPage({

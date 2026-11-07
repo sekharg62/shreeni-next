@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/siteConfig";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Shipping & Delivery",
   description: `Shipping timelines, charges, and delivery information for ${siteConfig.name} orders.`,
-};
+  path: "/shipping",
+});
 
 export default function ShippingPage() {
   return (

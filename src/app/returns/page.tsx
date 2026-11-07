@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/siteConfig";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Returns & Exchange",
   description: `Return and exchange policy for ${siteConfig.name} — eligibility, timelines, and how to raise a request.`,
-};
+  path: "/returns",
+});
 
 export default function ReturnsPage() {
   return (

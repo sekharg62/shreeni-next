@@ -3,15 +3,17 @@ import Link from "next/link";
 import { ArrowRight, Droplets, Layers, Scissors, Search, Sparkles, Spline, Sun, Wind } from "lucide-react";
 import Container from "@/components/Container";
 import { siteConfig } from "@/config/siteConfig";
+import { pageMetadata } from "@/lib/seo";
 
 // NOTE: Starter copy describing the weaves in general terms. Have it reviewed (and add real
 // photos of your weavers and looms) before launch.
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Craftsmanship",
   description:
     "The handwoven traditions behind every Shreeni saree — Baluchori, Swarnachori, Jamdani, Tant, Kantha and Bengal silks — and how they are made.",
-};
+  path: "/about/craftsmanship",
+});
 
 const WEAVES = [
   {

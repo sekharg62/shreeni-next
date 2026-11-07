@@ -9,6 +9,8 @@ import ProductCard from "@/components/ProductCard";
 import Pagination from "@/components/ui/Pagination";
 import { getCategory, getCategoryProducts, getPrerenderCategorySlugs } from "@/lib/data/catalog";
 import type { CategoryDetail } from "@/types/category";
+import { siteConfig } from "@/config/siteConfig";
+import { pageMetadata, snippet } from "@/lib/seo";
 
 /** Sentinel used only when the backend is unreachable at build time. */
 const PLACEHOLDER = "__placeholder__";
@@ -29,16 +31,15 @@ export async function generateMetadata({ params }: PageProps<"/sarees/[category]
   const category = await loadCategory(slug);
   if (!category) return { title: "Not Found" };
   const image = category.bannerUrl ?? category.posterUrl;
-  return {
-    title: category.name,
-    description: category.description ?? `Shop ${category.name} sarees at Shreeni.`,
-    alternates: { canonical: `/sarees/${category.slug}` },
-    openGraph: {
-      title: category.name,
-      description: category.description ?? undefined,
-      ...(image && { images: [{ url: image }] }),
-    },
-  };
+  return pageMetadata({
+    title: /saree/i.test(category.name) ? category.name : `${category.name} Sarees`,
+    description: snippet(
+      category.description ??
+        `Shop handwoven ${category.name} sarees online at ${siteConfig.name}. Authentic Bengal weaves, delivered across India.`,
+    ),
+    path: `/sarees/${category.slug}`,
+    images: image ? [image] : undefined,
+  });
 }
 
 function crumbsFor(category: CategoryDetail): Crumb[] {

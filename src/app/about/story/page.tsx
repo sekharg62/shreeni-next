@@ -3,13 +3,15 @@ import Link from "next/link";
 import { ArrowRight, BadgeCheck, HandHeart, Leaf, Truck } from "lucide-react";
 import Container from "@/components/Container";
 import { siteConfig } from "@/config/siteConfig";
+import { pageMetadata } from "@/lib/seo";
 
 // NOTE: Starter copy. Replace with Shreeni's real story (founder, year, place, people) before launch.
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Our Story",
   description: `How ${siteConfig.name} brings Bengal's handwoven sarees — Baluchori, Jamdani, Tant and more — from the loom to your wardrobe.`,
-};
+  path: "/about/story",
+});
 
 const VALUES = [
   {
