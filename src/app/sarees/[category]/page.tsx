@@ -55,31 +55,46 @@ export default async function CategoryPage({ params, searchParams }: PageProps<"
   const { category: slug } = await params;
   const category = await loadCategory(slug);
   if (!category) notFound();
+  // The banner artwork already shows the name and description, so with a banner the page doesn't
+  // repeat them (they stay in the page, visually hidden, for search engines and screen readers).
+  const hasBanner = Boolean(category.bannerUrl ?? category.posterUrl);
 
   return (
     <>
-      <Container className="pt-6 sm:pt-8">
+      <Container className="pt-3 sm:pt-4">
         <Breadcrumb items={crumbsFor(category)} />
       </Container>
 
       {/* Phones: edge to edge. Tablet/desktop: lined up with the breadcrumb and grid (same gutters as <Container>). */}
-      <div className="mt-4 sm:mx-auto sm:mt-6 sm:max-w-[1440px] sm:px-6 lg:px-8">
+      <div className="mt-3 sm:mx-auto sm:mt-4 sm:max-w-[1440px] sm:px-6 lg:px-8">
         <CategoryBanner name={category.name} bannerUrl={category.bannerUrl} posterUrl={category.posterUrl} />
       </div>
 
-      <section className="pb-20 pt-10 sm:pt-12">
+      <section className={`pb-20 ${hasBanner ? "pt-2 sm:pt-4" : "pt-8 sm:pt-10"}`}>
         <Container>
-          <header className="mx-auto max-w-3xl text-center">
-            <h1 className="font-serif text-3xl font-semibold text-primary sm:text-4xl">{category.name}</h1>
-            <div className="mx-auto mt-4 h-0.5 w-16 bg-secondary" />
-            {category.description && (
-              <p className="mt-5 text-base leading-relaxed text-muted sm:text-lg">{category.description}</p>
-            )}
-          </header>
+          {hasBanner ? (
+            <header className="sr-only">
+              <h1>{category.name}</h1>
+              {category.description && <p>{category.description}</p>}
+            </header>
+          ) : (
+            <header className="mx-auto max-w-3xl text-center">
+              <h1 className="font-serif text-3xl font-semibold text-primary sm:text-4xl">{category.name}</h1>
+              <div className="mx-auto mt-4 h-0.5 w-16 bg-secondary" />
+              {category.description && (
+                <p className="mt-5 text-base leading-relaxed text-muted sm:text-lg">{category.description}</p>
+              )}
+            </header>
+          )}
 
           {/* The header above is static; the product grid streams in (it reads ?page=). */}
           <Suspense fallback={<ProductGridSkeleton />}>
-            <CategoryProducts slug={category.slug} name={category.name} searchParams={searchParams} />
+            <CategoryProducts
+              slug={category.slug}
+              name={category.name}
+              searchParams={searchParams}
+              afterBanner={hasBanner}
+            />
           </Suspense>
         </Container>
       </section>
@@ -91,8 +106,11 @@ async function CategoryProducts({
   slug,
   name,
   searchParams,
+  afterBanner,
 }: {
   slug: string;
+  /** Directly under the banner (no visible title): less space above the product count. */
+  afterBanner: boolean;
   name: string;
   searchParams: PageProps<"/sarees/[category]">["searchParams"];
 }) {
@@ -136,12 +154,12 @@ async function CategoryProducts({
 
   return (
     <>
-      <p className="mt-10 border-b border-border pb-4 text-sm text-muted" aria-live="polite">
+      <p className={`${afterBanner ? "mt-2" : "mt-10"} border-b border-border pb-3 text-sm text-muted`} aria-live="polite">
         {meta.total <= meta.limit
           ? `${meta.total} ${meta.total === 1 ? "product" : "products"}`
           : `Showing ${from}–${to} of ${meta.total} products`}
       </p>
-      <ul className={`mt-8 ${PRODUCT_GRID}`}>
+      <ul className={`mt-5 sm:mt-6 ${PRODUCT_GRID}`}>
         {items.map((p) => (
           <li key={p.id}>
             <ProductCard product={p} />

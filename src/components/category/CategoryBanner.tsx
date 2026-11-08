@@ -19,7 +19,9 @@ export default function CategoryBanner({ name, bannerUrl, posterUrl }: Props) {
 
   // Phone shape follows whichever image phones actually get.
   const mobileShape = posterUrl ? "aspect-[4/5]" : "aspect-[8/3]";
-  const desktopShape = bannerUrl ? "sm:aspect-[8/3]" : "sm:aspect-[4/5] sm:max-w-md sm:mx-auto";
+  // Tablet 8:3; desktop a slimmer 4:1 so products start higher on the page (the image is centre-cropped,
+  // so keep a banner's text in its middle band).
+  const desktopShape = bannerUrl ? "sm:aspect-[8/3] lg:aspect-[4/1]" : "sm:aspect-[4/5] sm:max-w-md sm:mx-auto";
 
   // Full width on phones; inside the 1440px content area (minus gutters) from 640px up.
   const common = { alt: name, fill: true, sizes: "(min-width: 1440px) 1376px, 100vw" } as const;
@@ -31,7 +33,7 @@ export default function CategoryBanner({ name, bannerUrl, posterUrl }: Props) {
   } = getImageProps({ ...common, src: mobileSrc });
 
   return (
-    <div className={`relative w-full overflow-hidden bg-background sm:rounded-lg ${mobileShape} ${desktopShape} sm:max-h-[70vh]`}>
+    <div className={`relative w-full overflow-hidden bg-background sm:rounded-lg ${mobileShape} ${desktopShape} sm:max-h-[70vh] lg:max-h-[360px]`}>
       <picture>
         <source media="(min-width: 640px)" srcSet={desktop} />
         {/* eslint-disable-next-line jsx-a11y/alt-text -- alt comes from getImageProps */}
