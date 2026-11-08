@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
+import { useId } from "react";
+import RangeSlider from "@/components/ui/RangeSlider";
 import { Check } from "lucide-react";
 import { priceLabel, type CatalogFilters } from "@/lib/filters";
 import type { ProductFacets } from "@/types/product";
@@ -49,76 +50,59 @@ function OptionRow({
   );
 }
 
-export function PriceOptions({ facets, filters, onChange }: GroupProps) {
-  const [min, setMin] = useState(filters.minPrice?.toString() ?? "");
-  const [max, setMax] = useState(filters.maxPrice?.toString() ?? "");
-  const anySelected = filters.minPrice !== undefined || filters.maxPrice !== undefined;
-  // Unique ids: the desktop panel and the phone sheet can both be in the page.
-  const id = useId();
+const STEP = 100; // ₹100 slider steps
+const rupees = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    const lo = min === "" ? undefined : Math.max(0, Math.floor(Number(min)));
-    const hi = max === "" ? undefined : Math.max(0, Math.floor(Number(max)));
-    // Swap if entered the wrong way round.
-    const [a, b] = lo !== undefined && hi !== undefined && lo > hi ? [hi, lo] : [lo, hi];
-    onChange({ minPrice: a, maxPrice: b });
-  };
+/** Price slider for the category: ends from the cheapest/dearest product (rounded to ₹100), ₹100 steps. */
+function PriceSlider({ facets, filters, onChange }: GroupProps) {
+  const lo = Math.floor((facets.minPrice ?? 0) / 100 / STEP) * STEP;
+  const hi = Math.max(lo + STEP, Math.ceil((facets.maxPrice ?? 0) / 100 / STEP) * STEP);
+  return (
+    <RangeSlider
+      className="px-1 pb-2 pt-1"
+      min={lo}
+      max={hi}
+      step={STEP}
+      value={[filters.minPrice ?? lo, filters.maxPrice ?? hi]}
+      format={rupees}
+      labels={["Minimum price", "Maximum price"]}
+      openEnded
+      // A handle at an end means "no limit" on that side.
+      onCommit={([a, b]) => onChange({ minPrice: a > lo ? a : undefined, maxPrice: b < hi ? b : undefined })}
+    />
+  );
+}
+
+export function PriceOptions({ facets, filters, onChange }: GroupProps) {
+  const anySelected = filters.minPrice !== undefined || filters.maxPrice !== undefined;
+  // Unique radio group name: the desktop panel and the phone sheet can both be in the page.
+  const id = useId();
+  const canSlide = facets.minPrice !== null && facets.maxPrice !== null && facets.maxPrice > facets.minPrice;
 
   return (
-    <div className="space-y-1">
-      <OptionRow type="radio" name={`${id}-price`} checked={!anySelected} onChange={() => onChange({ minPrice: undefined, maxPrice: undefined })}>
-        Any price
-      </OptionRow>
-      {facets.priceBuckets.map((b) => {
-        const lo = b.min === null ? undefined : b.min / 100;
-        const hi = b.max === null ? undefined : b.max / 100;
-        return (
-          <OptionRow
-            key={`${b.min}-${b.max}`}
-            type="radio"
-            name={`${id}-price`}
-            checked={filters.minPrice === lo && filters.maxPrice === hi}
-            onChange={() => onChange({ minPrice: lo, maxPrice: hi })}
-          >
-            {priceLabel(lo, hi)}
-            <Count n={b.count} />
-          </OptionRow>
-        );
-      })}
-      <form onSubmit={submit} className="flex items-center gap-2 pt-2" aria-label="Custom price range">
-        <label className="sr-only" htmlFor={`${id}-min`}>
-          Minimum price in rupees
-        </label>
-        <input
-          id={`${id}-min`}
-          inputMode="numeric"
-          placeholder={facets.minPrice !== null ? `₹${Math.floor(facets.minPrice / 100)}` : "Min"}
-          value={min}
-          onChange={(e) => setMin(e.target.value.replace(/\D/g, ""))}
-          className="w-full min-w-0 rounded-md border border-border bg-surface px-2.5 py-2 text-sm focus:border-primary focus:outline-none"
-        />
-        <span className="text-muted" aria-hidden="true">
-          –
-        </span>
-        <label className="sr-only" htmlFor={`${id}-max`}>
-          Maximum price in rupees
-        </label>
-        <input
-          id={`${id}-max`}
-          inputMode="numeric"
-          placeholder={facets.maxPrice !== null ? `₹${Math.ceil(facets.maxPrice / 100)}` : "Max"}
-          value={max}
-          onChange={(e) => setMax(e.target.value.replace(/\D/g, ""))}
-          className="w-full min-w-0 rounded-md border border-border bg-surface px-2.5 py-2 text-sm focus:border-primary focus:outline-none"
-        />
-        <button
-          type="submit"
-          className="shrink-0 rounded-md border border-primary px-3 py-2 text-xs font-semibold uppercase tracking-wider text-primary transition-colors hover:bg-primary hover:text-surface"
-        >
-          Go
-        </button>
-      </form>
+    <div className="space-y-3">
+      {canSlide && <PriceSlider facets={facets} filters={filters} onChange={onChange} />}
+      <div className="space-y-1">
+        <OptionRow type="radio" name={`${id}-price`} checked={!anySelected} onChange={() => onChange({ minPrice: undefined, maxPrice: undefined })}>
+          Any price
+        </OptionRow>
+        {facets.priceBuckets.map((b) => {
+          const lo = b.min === null ? undefined : b.min / 100;
+          const hi = b.max === null ? undefined : b.max / 100;
+          return (
+            <OptionRow
+              key={`${b.min}-${b.max}`}
+              type="radio"
+              name={`${id}-price`}
+              checked={filters.minPrice === lo && filters.maxPrice === hi}
+              onChange={() => onChange({ minPrice: lo, maxPrice: hi })}
+            >
+              {priceLabel(lo, hi)}
+              <Count n={b.count} />
+            </OptionRow>
+          );
+        })}
+      </div>
     </div>
   );
 }
