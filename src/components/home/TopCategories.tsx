@@ -6,7 +6,7 @@ import { CACHE_TAGS, CATEGORY_SLUGS } from "@/config/constants";
 import { categoryService } from "@/services/categoryService";
 import type { CategoryCard } from "@/types/category";
 
-async function getTopCategories(slug: string): Promise<CategoryCard[]> {
+export async function getTopCategories(slug: string): Promise<CategoryCard[]> {
   "use cache";
   cacheTag(CACHE_TAGS.categories);
   try {
@@ -21,7 +21,7 @@ async function getTopCategories(slug: string): Promise<CategoryCard[]> {
   }
 }
 
-function CategoryTile({ category }: { category: CategoryCard }) {
+export function CategoryTile({ category }: { category: CategoryCard }) {
   return (
     <Link href={`/sarees/${category.slug}`} className="group flex flex-col items-center gap-3 text-center">
       <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg border border-border bg-background transition-colors group-hover:border-secondary">

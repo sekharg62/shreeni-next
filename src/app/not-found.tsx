@@ -30,7 +30,7 @@ export default function NotFound() {
             Back to Home
           </Link>
           <Link
-            href="/#categories"
+            href="/sarees"
             className="rounded-full border border-primary px-7 py-3 text-base font-medium text-primary transition-colors hover:bg-primary hover:text-surface"
           >
             Shop Sarees

@@ -88,7 +88,7 @@ export default function WishlistPage() {
               <p className="font-serif text-lg font-semibold text-dark">Your wishlist is empty</p>
               <p className="max-w-sm text-sm text-muted">Tap the heart on any saree to save it here for later.</p>
               <Link
-                href="/#categories"
+                href="/sarees"
                 className="mt-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-wider text-surface transition-colors hover:bg-dark"
               >
                 Explore Sarees

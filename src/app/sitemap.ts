@@ -9,6 +9,7 @@ import { absoluteUrl } from "@/lib/seo";
  */
 const STATIC_PAGES = [
   "/",
+  "/sarees",
   "/about/story",
   "/about/craftsmanship",
   "/contact/help",
