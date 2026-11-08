@@ -9,10 +9,15 @@ const SWIPE_PX = 50;
 /** Movement below this counts as a tap (opens the full-screen view). */
 const TAP_PX = 8;
 
-type Props = { images: string[]; name: string };
+type Props = {
+  images: string[];
+  name: string;
+  /** Every size is sold out: show the corner ribbon (the photos stay full colour). */
+  soldOut?: boolean;
+};
 
 /** Main photo + thumbnails. Swipe on phones, arrows and keys on desktop. */
-export default function ProductGallery({ images, name }: Props) {
+export default function ProductGallery({ images, name, soldOut = false }: Props) {
   const [index, setIndex] = useState(0);
   const [zoomed, setZoomed] = useState(false);
   const startX = useRef<number | null>(null);
@@ -92,6 +97,12 @@ export default function ProductGallery({ images, name }: Props) {
               {index + 1} / {count}
             </span>
           </>
+        )}
+        {soldOut && (
+          // Same corner ribbon as the product cards, sized for the large photo.
+          <span className="pointer-events-none absolute -left-12 top-7 z-10 w-48 -rotate-45 bg-primary py-1.5 text-center text-xs font-semibold uppercase tracking-wider text-surface shadow-md">
+            Out of Stock
+          </span>
         )}
         <p className="sr-only" aria-live="polite">
           Photo {index + 1} of {count}

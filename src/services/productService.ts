@@ -24,6 +24,7 @@ export function toProductCardItem(p: ProductCardDto): ProductCardItem {
     price: paiseToRupees(p.price),
     compareAtPrice: money(p.compareAtPrice),
     image: p.imageUrl,
+    inStock: p.inStock,
   };
 }
 

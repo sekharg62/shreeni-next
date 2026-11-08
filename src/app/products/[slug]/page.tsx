@@ -105,7 +105,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
       {/* Above the fold: everything from one API call */}
       <Container className="mt-6 sm:mt-8">
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
-          <ProductGallery images={product.images} name={product.name} />
+          <ProductGallery images={product.images} name={product.name} soldOut={!product.inStock} />
 
           <div className="flex flex-col gap-6 lg:sticky lg:top-28 lg:self-start">
             <div>

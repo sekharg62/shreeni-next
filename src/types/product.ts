@@ -17,6 +17,8 @@ export type ProductCardDto = {
   price: number;
   compareAtPrice: number | null;
   imageUrl: string | null;
+  /** false when every size is sold out */
+  inStock: boolean;
 };
 
 /** `GET /products` response body. */
