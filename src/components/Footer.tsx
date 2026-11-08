@@ -4,10 +4,10 @@ import Container from "@/components/Container";
 import { siteConfig } from "@/config/siteConfig";
 
 const shopLinks = [
-  { label: "Silk Sarees", href: "/sarees/silk" },
-  { label: "Cotton Sarees", href: "/sarees/cotton" },
-  { label: "Designer Sarees", href: "/sarees/designer" },
-  { label: "New Arrivals", href: "/collections/new" },
+  { label: "Baluchori Sarees", href: "/sarees/baluchori" },
+  { label: "Jamdani Sarees", href: "/sarees/jamdani" },
+  { label: "Murshidabad Silk", href: "/sarees/murshidabad-silk" },
+  { label: "Tant Sarees", href: "/sarees/tant" },
 ];
 
 const helpLinks = [

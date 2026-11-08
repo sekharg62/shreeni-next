@@ -21,11 +21,6 @@ export const navLinks: NavLink[] = [
     ],
   },
   {
-    label: "Collections",
-    href: "/collections",
-    items: [{ label: "Diwali Gift", href: "/collections/diwali-gift" }],
-  },
-  {
     label: "About",
     href: "/about/story",
     items: [

@@ -1,12 +1,6 @@
 import Link from "next/link";
 import { siteConfig } from "@/config/siteConfig";
 
-const suggestions = [
-  { label: "Silk Sarees", href: "/sarees/silk" },
-  { label: "New Arrivals", href: "/collections/new" },
-  { label: "Wedding Edit", href: "/collections/wedding" },
-  { label: "Contact Us", href: "/contact" },
-];
 
 export default function NotFound() {
   return (
@@ -36,30 +30,11 @@ export default function NotFound() {
             Back to Home
           </Link>
           <Link
-            href="/sarees"
+            href="/#categories"
             className="rounded-full border border-primary px-7 py-3 text-base font-medium text-primary transition-colors hover:bg-primary hover:text-surface"
           >
             Shop Sarees
           </Link>
-        </div>
-
-        {/* Suggestions */}
-        <div className="mt-12">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-            Popular destinations
-          </p>
-          <ul className="mt-4 flex flex-wrap items-center justify-center gap-3">
-            {suggestions.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="rounded-full border border-border bg-surface px-4 py-2 text-sm text-dark transition-colors hover:border-primary hover:text-primary"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
         </div>
 
         <p className="mt-10 text-sm text-muted">

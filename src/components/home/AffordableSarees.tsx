@@ -10,17 +10,17 @@ export default function AffordableSarees() {
           <div className="mx-auto mb-6 h-0.5 w-16 bg-secondary" />
 
           <h2 className="font-serif text-2xl font-semibold sm:text-4xl">
-            View Our Most Affordable Sarees
+            Everyday Cotton Sarees
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-surface/80 sm:text-lg">
-            Get your saree below ₹2500 — handpicked drapes that bring everyday
-            elegance without stretching your budget.
+            Light, breathable Tant cottons from Bengal — handpicked drapes that
+            bring everyday elegance without stretching your budget.
           </p>
 
           <div className="mt-2">
             <ViewAllButton
-              href="/collections/under-2500"
-              label="Shop Under ₹2500"
+              href="/sarees/tant"
+              label="Shop Tant Sarees"
               variant="light"
             />
           </div>

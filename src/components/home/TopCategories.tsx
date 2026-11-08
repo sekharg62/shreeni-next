@@ -57,7 +57,7 @@ export default async function TopCategories() {
   if (categories.length === 0) return null;
 
   return (
-    <section className="bg-surface py-20 sm:py-24" aria-labelledby="top-categories-heading">
+    <section id="categories" className="scroll-mt-24 bg-surface py-20 sm:py-24" aria-labelledby="top-categories-heading">
       <Container>
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-secondary">Categories</p>
