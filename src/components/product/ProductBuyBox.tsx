@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Heart, ShoppingCart } from "lucide-react";
 import QuantityStepper from "@/components/ui/QuantityStepper";
 import SizeSelector from "./SizeSelector";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useToast } from "@/context/ToastContext";
+import { trackEcommerce } from "@/lib/analytics";
 import { formatINR } from "@/lib/format";
 import type { ProductVariant } from "@/types/product";
 
@@ -18,13 +19,20 @@ type Props = {
   price: number;
   compareAtPrice: number | null;
   variants: ProductVariant[];
+  /** Weave / category name, for analytics. */
+  category?: string;
 };
 
 /** Price, size, quantity stepper and the cart / wishlist buttons. */
-export default function ProductBuyBox({ productId, slug, name, image, price, compareAtPrice, variants }: Props) {
-  const { addItem, openCart } = useCart();
+export default function ProductBuyBox({ productId, slug, name, image, price, compareAtPrice, variants, category }: Props) {
+  const { addItem } = useCart();
   const { isWishlisted, toggle } = useWishlist();
   const toast = useToast();
+
+  // "Product viewed" — powers GA4's most-viewed products report. Once per product page visit.
+  useEffect(() => {
+    trackEcommerce("view_item", [{ productId, name, price, category }]);
+  }, [productId, name, price, category]);
 
   const orderable = variants.filter((v) => v.available > 0);
   // One size (e.g. "Free Size") is picked for the shopper; with several they choose.
@@ -63,11 +71,12 @@ export default function ProductBuyBox({ productId, slug, name, image, price, com
         price: variant.price,
         image,
         maxQuantity: variant.available,
+        category,
       },
       quantity,
     );
-    if (thenOpen) openCart();
-    else toast.success(`${name} added to cart`);
+    // addItem already opens the cart drawer.
+    if (!thenOpen) toast.success(`${name} added to cart`);
   };
 
   return (

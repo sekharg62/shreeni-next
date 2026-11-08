@@ -124,6 +124,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
               price={product.price}
               compareAtPrice={product.compareAtPrice}
               variants={product.variants}
+              category={product.breadcrumb.at(-1)?.name}
             />
           </div>
         </div>

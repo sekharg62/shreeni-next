@@ -8,7 +8,8 @@ import AddressFields, { focusFirstAddressError } from "@/components/address/Addr
 import Input from "@/components/ui/Input";
 import OrderSummary, { needsSize } from "./OrderSummary";
 import { useAuth } from "@/context/AuthContext";
-import { isBlocked, useCart } from "@/context/CartContext";
+import { isBlocked, useCart, type CartItem } from "@/context/CartContext";
+import { trackEcommerce } from "@/lib/analytics";
 import { useToast } from "@/context/ToastContext";
 import { addressLines, emptyAddress, formatPhone, validateAddress, type AddressErrors } from "@/lib/address";
 import type { Address, AddressInput } from "@/types/address";
@@ -23,6 +24,12 @@ type ContactErrors = { email?: string; phone?: string };
 type Delivery = { name: string; phone: string; lines: string[] };
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Lines that can be bought now, as analytics items. */
+const buyable = (items: CartItem[]) =>
+  items
+    .filter((i) => !isBlocked(i))
+    .map((i) => ({ productId: i.productId, name: i.name, price: i.price, quantity: i.quantity, size: i.size, category: i.category }));
 
 function readGuest(): GuestDraft {
   try {
@@ -91,6 +98,14 @@ export default function CheckoutView() {
   useEffect(() => {
     if (review) reviewRef.current?.focus();
   }, [review]);
+
+  // Checkout funnel: "begin_checkout" once the cart is loaded ("add_shipping_info" is sent when the address is confirmed).
+  const began = useRef(false);
+  useEffect(() => {
+    if (!ready || began.current || items.length === 0) return;
+    began.current = true;
+    trackEcommerce("begin_checkout", buyable(items));
+  }, [ready, items]);
 
   // Items without a size, or that sold out / went off sale, must be fixed first.
   const blocked = items.filter((i) => needsSize(i) || isBlocked(i));
@@ -165,6 +180,7 @@ export default function CheckoutView() {
       saveDraft({ type: "guest", email: guest.email.trim(), phone: guest.phone, address: guest.address });
     }
     setReview(delivery);
+    trackEcommerce("add_shipping_info", buyable(items));
   };
 
   function saveDraft(data: object) {

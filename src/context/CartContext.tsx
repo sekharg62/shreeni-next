@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import { getApiErrorMessage } from "@/lib/api";
+import { trackEcommerce } from "@/lib/analytics";
 import { paiseToRupees } from "@/lib/format";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
@@ -48,7 +49,19 @@ export type CartItem = {
   quantity: number;
   /** Set by the server check: why this line can't be bought as-is. */
   issue?: CartIssue | null;
+  /** Category name, for analytics (not stored on the server). */
+  category?: string;
 };
+
+/** A cart line as an analytics item, for `quantity` pieces. */
+const asItem = (i: Omit<CartItem, "quantity">, quantity: number) => ({
+  productId: i.productId,
+  name: i.name,
+  price: i.price,
+  quantity,
+  size: i.size,
+  category: i.category,
+});
 
 /** Lines that block checkout (sold out / off sale). */
 export const isBlocked = (i: CartItem) => i.issue === "OUT_OF_STOCK" || i.issue === "UNAVAILABLE";
@@ -147,6 +160,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const setAll = useCallback((next: CartItem[]) => {
     itemsRef.current = next;
     setItems(next);
+  }, []);
+  /** Open the drawer and report "cart viewed" with the lines that can be bought now. */
+  const showCart = useCallback(() => {
+    setIsOpen(true);
+    trackEcommerce("view_cart", itemsRef.current.filter((i) => !isBlocked(i)).map((i) => asItem(i, i.quantity)));
   }, []);
   /** Bumped on every (re)load and auth change, so outdated responses are ignored. */
   const generation = useRef(0);
@@ -302,10 +320,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
         ? prev.map((i) => (i.id === item.id ? { ...i, ...item, quantity: nextQty, issue: null } : i))
         : [...prev, { ...item, quantity: nextQty, issue: null }];
       commit(next);
-      setIsOpen(true);
       if (signedIn) sync(item.variantId, nextQty, true);
+      const added = nextQty - (existing?.quantity ?? 0);
+      if (added > 0) trackEcommerce("add_to_cart", [asItem(item, added)]);
+      showCart();
     },
-    [commit, signedIn, sync, toast]
+    [commit, showCart, signedIn, sync, toast]
   );
 
   const removeItem = useCallback(
@@ -313,6 +333,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const line = itemsRef.current.find((i) => i.id === id);
       commit(itemsRef.current.filter((i) => i.id !== id));
       if (signedIn && line?.variantId) sync(line.variantId, 0, true);
+      if (line) trackEcommerce("remove_from_cart", [asItem(line, line.quantity)]);
     },
     [commit, signedIn, sync]
   );
@@ -325,6 +346,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const q = line.maxQuantity !== undefined ? Math.min(quantity, line.maxQuantity) : quantity;
       commit(itemsRef.current.map((i) => (i.id === id ? { ...i, quantity: q, issue: null } : i)));
       if (signedIn && line.variantId) sync(line.variantId, q);
+      if (q !== line.quantity) {
+        trackEcommerce(q > line.quantity ? "add_to_cart" : "remove_from_cart", [asItem(line, Math.abs(q - line.quantity))]);
+      }
     },
     [commit, removeItem, signedIn, sync]
   );
@@ -340,7 +364,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [commit, signedIn, toast]);
 
-  const openCart = useCallback(() => setIsOpen(true), []);
+  const openCart = useCallback(() => showCart(), [showCart]);
   const closeCart = useCallback(() => setIsOpen(false), []);
 
   const itemCount = useMemo(() => items.reduce((sum, i) => sum + i.quantity, 0), [items]);
