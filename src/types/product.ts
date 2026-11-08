@@ -1,12 +1,25 @@
+import type { ApiFilterParams } from "@/lib/filters";
 import type { PageMeta, Paginated } from "./api";
 
 /** Query for `GET /products`. */
-export type ProductListParams = {
+export type ProductListParams = ApiFilterParams & {
   /** Category slug; its sub-categories are included. */
   category: string;
   page?: number;
   /** 1–48, default 24 */
   limit?: number;
+};
+
+/** `GET /products/facets` — filter options with counts. Prices in paise. */
+export type ProductFacets = {
+  total: number;
+  colors: { slug: string; name: string; hexCode: string | null; count: number }[];
+  tags: { slug: string; name: string; color: string | null; count: number }[];
+  priceBuckets: { min: number | null; max: number | null; count: number }[];
+  minPrice: number | null;
+  maxPrice: number | null;
+  offers: { minDiscount: number; count: number }[];
+  inStockCount: number;
 };
 
 /** One product as the API sends it. Prices are in paise. */

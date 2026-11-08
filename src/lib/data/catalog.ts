@@ -8,7 +8,8 @@ import { productService } from "@/services/productService";
 import { reviewService } from "@/services/reviewService";
 import type { ReviewListResponse } from "@/types/review";
 import type { CategoryDetail } from "@/types/category";
-import type { ProductCardItem, ProductCardPage, ProductDetail } from "@/types/product";
+import type { ProductCardItem, ProductCardPage, ProductDetail, ProductFacets } from "@/types/product";
+import type { ApiFilterParams } from "@/lib/filters";
 
 /** A published category, or null if it doesn't exist / isn't published. Other errors throw (not cached). */
 export async function getCategory(slug: string): Promise<CategoryDetail | null> {
@@ -24,15 +25,36 @@ export async function getCategory(slug: string): Promise<CategoryDetail | null> 
 }
 
 /** One page of a category's product cards, or null if the category is gone. */
-export async function getCategoryProducts(slug: string, page: number): Promise<ProductCardPage | null> {
+export async function getCategoryProducts(
+  slug: string,
+  page: number,
+  filters: ApiFilterParams = {},
+): Promise<ProductCardPage | null> {
   "use cache";
   cacheTag(CACHE_TAGS.products, CACHE_TAGS.categories);
   cacheLife("minutes");
   try {
-    return await productService.list({ category: slug, page, limit: PRODUCTS_PER_PAGE });
+    return await productService.list({ category: slug, page, limit: PRODUCTS_PER_PAGE, ...filters });
   } catch (err) {
     if (getApiErrorStatus(err) === 404) return null;
     throw err;
+  }
+}
+
+/** Filter options with counts for a category (one cache entry per filter combination); null if unavailable. */
+export async function getCategoryFacets(slug: string, filters: ApiFilterParams = {}): Promise<ProductFacets | null> {
+  "use cache";
+  cacheTag(CACHE_TAGS.products, CACHE_TAGS.categories);
+  try {
+    // Sorting doesn't change the options.
+    const params: ApiFilterParams = { ...filters };
+    delete params.sort;
+    const facets = await productService.facets({ category: slug, ...params });
+    cacheLife("minutes");
+    return facets;
+  } catch {
+    cacheLife("seconds");
+    return null;
   }
 }
 

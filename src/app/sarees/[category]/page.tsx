@@ -7,7 +7,9 @@ import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import CategoryBanner from "@/components/category/CategoryBanner";
 import ProductCard from "@/components/ProductCard";
 import Pagination from "@/components/ui/Pagination";
-import { getCategory, getCategoryProducts, getPrerenderCategorySlugs } from "@/lib/data/catalog";
+import { getCategory, getCategoryFacets, getCategoryProducts, getPrerenderCategorySlugs } from "@/lib/data/catalog";
+import CatalogShell from "@/components/filters/CatalogShell";
+import { EMPTY_FILTERS, hasFilters, parseFilters, toApiParams, toSearch } from "@/lib/filters";
 import type { CategoryDetail } from "@/types/category";
 import { siteConfig } from "@/config/siteConfig";
 import { pageMetadata, snippet } from "@/lib/seo";
@@ -109,32 +111,24 @@ async function CategoryProducts({
   afterBanner,
 }: {
   slug: string;
-  /** Directly under the banner (no visible title): less space above the product count. */
+  /** Directly under the banner (no visible title): less space above the toolbar. */
   afterBanner: boolean;
   name: string;
   searchParams: PageProps<"/sarees/[category]">["searchParams"];
 }) {
-  const raw = (await searchParams).page;
-  const requested = Number(Array.isArray(raw) ? raw[0] : raw);
-  const page = Number.isInteger(requested) && requested >= 1 && requested <= 1000 ? requested : 1;
-
-  const result = await getCategoryProducts(slug, page);
+  const filters = parseFilters(await searchParams);
+  const api = toApiParams(filters);
+  const [result, facets] = await Promise.all([
+    getCategoryProducts(slug, filters.page, api),
+    getCategoryFacets(slug, api),
+  ]);
   if (!result) notFound();
   const { items, meta } = result;
+  const basePath = `/sarees/${slug}`;
+  const filtered = hasFilters(filters);
 
-  // Asked for a page past the end: send them to the last real page's content.
-  if (items.length === 0 && meta.total > 0) {
-    return (
-      <p className="mt-16 text-center text-muted">
-        That page doesn&apos;t exist.{" "}
-        <Link href={`/sarees/${slug}`} className="font-medium text-primary underline underline-offset-4">
-          Back to page 1
-        </Link>
-      </p>
-    );
-  }
-
-  if (meta.total === 0) {
+  // Nothing in the category at all (no filters to blame).
+  if (meta.total === 0 && !filtered) {
     return (
       <div className="mx-auto mt-14 max-w-md rounded-lg border border-dashed border-border px-6 py-14 text-center">
         <p className="font-serif text-xl font-semibold text-dark">New {name} pieces are on their way</p>
@@ -149,29 +143,59 @@ async function CategoryProducts({
     );
   }
 
-  const from = (meta.page - 1) * meta.limit + 1;
-  const to = from + items.length - 1;
+  let content;
+  if (meta.total === 0) {
+    content = (
+      <div className="mx-auto mt-10 max-w-md rounded-lg border border-dashed border-border px-6 py-12 text-center">
+        <p className="font-serif text-xl font-semibold text-dark">No sarees match these filters</p>
+        <p className="mt-2 text-sm text-muted">Try removing a filter or two to see more.</p>
+        <Link
+          href={`${basePath}${toSearch({ ...filters, ...EMPTY_FILTERS, page: 1 })}`}
+          scroll={false}
+          className="mt-6 inline-flex rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-surface transition-opacity hover:opacity-90"
+        >
+          Clear filters
+        </Link>
+      </div>
+    );
+  } else if (items.length === 0) {
+    // Asked for a page past the end.
+    content = (
+      <p className="mt-16 text-center text-muted">
+        That page doesn&apos;t exist.{" "}
+        <Link href={`${basePath}${toSearch({ ...filters, page: 1 })}`} className="font-medium text-primary underline underline-offset-4">
+          Back to page 1
+        </Link>
+      </p>
+    );
+  } else {
+    content = (
+      <>
+        <ul className={`mt-5 sm:mt-6 ${PRODUCT_GRID}`}>
+          {items.map((p) => (
+            <li key={p.id}>
+              <ProductCard product={p} />
+            </li>
+          ))}
+        </ul>
+        <Pagination
+          page={meta.page}
+          totalPages={meta.totalPages}
+          hrefFor={(p) => `${basePath}${toSearch({ ...filters, page: p })}`}
+        />
+      </>
+    );
+  }
 
   return (
-    <>
-      <p className={`${afterBanner ? "mt-2" : "mt-10"} border-b border-border pb-3 text-sm text-muted`} aria-live="polite">
-        {meta.total <= meta.limit
-          ? `${meta.total} ${meta.total === 1 ? "product" : "products"}`
-          : `Showing ${from}–${to} of ${meta.total} products`}
-      </p>
-      <ul className={`mt-5 sm:mt-6 ${PRODUCT_GRID}`}>
-        {items.map((p) => (
-          <li key={p.id}>
-            <ProductCard product={p} />
-          </li>
-        ))}
-      </ul>
-      <Pagination
-        page={meta.page}
-        totalPages={meta.totalPages}
-        hrefFor={(p) => (p === 1 ? `/sarees/${slug}` : `/sarees/${slug}?page=${p}`)}
-      />
-    </>
+    <div className={afterBanner ? "mt-2" : "mt-10"}>
+      {/* Filtered/sorted views are near-duplicates of the category page: keep them out of search
+          (the canonical URL already points at the plain category). Plain page 2, 3… stay indexable. */}
+      {(filtered || filters.sort !== "featured") && <meta name="robots" content="noindex, follow" />}
+      <CatalogShell category={slug} filters={filters} facets={facets} total={meta.total}>
+        {content}
+      </CatalogShell>
+    </div>
   );
 }
 

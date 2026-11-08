@@ -108,3 +108,19 @@ h6 {
   .heart-pop { animation: none; }
 }
 
+
+/* Phone bottom sheets (filters, sort): slide up over a fading backdrop */
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.sheet-up {
+  animation: sheet-up 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.sheet-fade {
+  animation: lb-fade-in 0.25s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet-up,
+  .sheet-fade { animation: none; }
+}

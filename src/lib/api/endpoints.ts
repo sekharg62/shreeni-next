@@ -9,8 +9,10 @@ export const ENDPOINTS = {
     detail: (slug: string) => `/categories/${encodeURIComponent(slug)}`,
   },
   products: {
-    /** ?category=<slug>&page=&limit= */
+    /** ?category=<slug>&page=&limit= plus filters (minPrice, maxPrice, colors, tags, minDiscount, inStock, sort) */
     list: "/products",
+    /** ?category=<slug> plus the same filters → options with counts */
+    facets: "/products/facets",
     detail: (slug: string) => `/products/${encodeURIComponent(slug)}`,
     /** ?limit= (1–12) */
     related: (slug: string) => `/products/${encodeURIComponent(slug)}/related`,

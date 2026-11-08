@@ -1,8 +1,10 @@
 import { apiClient } from "@/lib/api";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 import { paiseToRupees } from "@/lib/format";
+import type { ApiFilterParams } from "@/lib/filters";
 import type {
   ProductCardDto,
+  ProductFacets,
   ProductCardItem,
   ProductCardPage,
   ProductDetail,
@@ -56,6 +58,12 @@ export const productService = {
       items: Array.isArray(data?.data) ? data.data.map(toProductCardItem) : [],
       meta: data.meta,
     };
+  },
+
+  /** Filter options (colours, tags, prices, offers, stock) with counts for a category. Public. */
+  async facets(params: ApiFilterParams & { category: string }, signal?: AbortSignal): Promise<ProductFacets> {
+    const { data } = await apiClient.get<ProductFacets>(ENDPOINTS.products.facets, { params, signal });
+    return data;
   },
 
   /** One published product for its page (everything except related). Public. 404 if missing. */
