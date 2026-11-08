@@ -16,10 +16,10 @@ export default function Header() {
         {/* Brand */}
         <Link href="/" aria-label={`${siteConfig.name} — Home`} className="flex shrink-0 items-center">
           <Image
-            src="/logo-footer.png"
+            src="/logo.webp"
             alt={`${siteConfig.name} Sarees`}
-            width={1024}
-            height={335}
+            width={800}
+            height={347}
             priority
             unoptimized
             className="h-12 w-auto sm:h-14"

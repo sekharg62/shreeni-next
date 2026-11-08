@@ -36,12 +36,13 @@ export default function Footer() {
           {/* Brand + contact */}
           <div className="space-y-4">
           <Image
-            src="/logo-footer.png"
+            src="/logo.webp"
             alt={`${siteConfig.name} Sarees`}
-            width={1024}
-            height={335}
+            width={800}
+            height={347}
             unoptimized
-            className="h-20 w-auto"
+            // The logo's dark blue lettering needs a soft light edge to read on the dark footer.
+            className="h-20 w-auto [filter:drop-shadow(0_0_0.75px_rgba(255,253,249,0.95))_drop-shadow(0_0_1px_rgba(255,253,249,0.6))_drop-shadow(0_0_8px_rgba(255,253,249,0.18))]"
           />
           <p className="max-w-xs text-sm text-background/70">
             {siteConfig.tagline}
