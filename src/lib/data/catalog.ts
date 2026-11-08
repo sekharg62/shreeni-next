@@ -8,7 +8,7 @@ import { productService } from "@/services/productService";
 import { reviewService } from "@/services/reviewService";
 import type { ReviewListResponse } from "@/types/review";
 import type { CategoryDetail } from "@/types/category";
-import type { ProductCardItem, ProductCardPage, ProductDetail, ProductFacets } from "@/types/product";
+import type { ProductCardItem, ProductCardPage, ProductDetail, ProductFacets, SearchSort } from "@/types/product";
 import type { ApiFilterParams } from "@/lib/filters";
 
 /** A published category, or null if it doesn't exist / isn't published. Other errors throw (not cached). */
@@ -154,5 +154,19 @@ export async function getSitemapCatalog(): Promise<{
   } catch {
     cacheLife("seconds");
     return { categories: [], products: [] };
+  }
+}
+
+/** One page of search results (one cache entry per query/sort/page); null if search is unavailable. */
+export async function getSearchResults(q: string, page: number, sort: SearchSort): Promise<ProductCardPage | null> {
+  "use cache";
+  cacheTag(CACHE_TAGS.products);
+  try {
+    const result = await productService.search({ q, page, sort, limit: PRODUCTS_PER_PAGE });
+    cacheLife("minutes");
+    return result;
+  } catch {
+    cacheLife("seconds");
+    return null;
   }
 }

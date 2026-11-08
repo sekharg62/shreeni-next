@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Search } from "lucide-react";
 import AccountButton from "./AccountButton";
 import { siteConfig } from "@/config/siteConfig";
 import { navLinks } from "@/config/nav";
@@ -8,6 +7,7 @@ import MobileMenu from "@/components/MobileMenu";
 import CartButton from "@/components/CartButton";
 import WishlistButton from "@/components/WishlistButton";
 import Container from "@/components/Container";
+import { SearchButton } from "@/components/search/SearchDialog";
 
 export default function Header() {
   return (
@@ -61,13 +61,7 @@ export default function Header() {
 
         {/* Actions (desktop) */}
         <div className="hidden items-center gap-1 md:flex sm:gap-2">
-          <Link
-            href="/search"
-            aria-label="Search"
-            className="rounded-full p-2 text-dark transition-colors hover:bg-background hover:text-primary"
-          >
-            <Search className="h-6 w-6" strokeWidth={1.8} aria-hidden="true" />
-          </Link>
+          <SearchButton shortcuts />
 
           <AccountButton />
 
@@ -76,8 +70,11 @@ export default function Header() {
           <CartButton />
         </div>
 
-        {/* Mobile menu (hamburger + full-screen overlay) */}
-        <MobileMenu />
+        {/* Phones: search + menu */}
+        <div className="flex items-center gap-1 md:hidden">
+          <SearchButton />
+          <MobileMenu />
+        </div>
       </Container>
     </header>
   );

@@ -13,6 +13,10 @@ export const ENDPOINTS = {
     list: "/products",
     /** ?category=<slug> plus the same filters → options with counts */
     facets: "/products/facets",
+    /** ?q=&sort=relevance|newest|price-asc|price-desc|discount&page=&limit= — typo-tolerant search */
+    search: "/products/search",
+    /** ?q= — search-as-you-type: categories + top products */
+    suggest: "/products/suggest",
     detail: (slug: string) => `/products/${encodeURIComponent(slug)}`,
     /** ?limit= (1–12) */
     related: (slug: string) => `/products/${encodeURIComponent(slug)}/related`,

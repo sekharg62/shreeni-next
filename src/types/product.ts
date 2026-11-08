@@ -134,3 +134,21 @@ export type RelatedProductsParams = { limit?: number };
 
 /** `GET /products/:slug/related` response body. */
 export type RelatedProductsResponse = ProductCardDto[];
+
+/* ───────────── Search ───────────── */
+
+export type SearchSort = "relevance" | "newest" | "price-asc" | "price-desc" | "discount";
+
+/** `GET /products/suggest` (prices in paise). */
+export type SearchSuggestionsDto = {
+  categories: { slug: string; name: string }[];
+  products: ProductCardDto[];
+  total: number;
+};
+
+/** Suggestions for the UI (prices in rupees). */
+export type SearchSuggestions = {
+  categories: { slug: string; name: string }[];
+  products: ProductCardItem[];
+  total: number;
+};

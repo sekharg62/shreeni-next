@@ -5,6 +5,9 @@ import type { ApiFilterParams } from "@/lib/filters";
 import type {
   ProductCardDto,
   ProductFacets,
+  SearchSort,
+  SearchSuggestions,
+  SearchSuggestionsDto,
   ProductCardItem,
   ProductCardPage,
   ProductDetail,
@@ -64,6 +67,18 @@ export const productService = {
   async facets(params: ApiFilterParams & { category: string }, signal?: AbortSignal): Promise<ProductFacets> {
     const { data } = await apiClient.get<ProductFacets>(ENDPOINTS.products.facets, { params, signal });
     return data;
+  },
+
+  /** Typo-tolerant product search, ranked by relevance (or sorted). Public. */
+  async search(params: { q: string; sort?: SearchSort; page?: number; limit?: number }): Promise<ProductCardPage> {
+    const { data } = await apiClient.get<ProductListResponse>(ENDPOINTS.products.search, { params });
+    return { items: Array.isArray(data?.data) ? data.data.map(toProductCardItem) : [], meta: data.meta };
+  },
+
+  /** Search-as-you-type suggestions. Public. */
+  async suggest(q: string, signal?: AbortSignal): Promise<SearchSuggestions> {
+    const { data } = await apiClient.get<SearchSuggestionsDto>(ENDPOINTS.products.suggest, { params: { q }, signal });
+    return { categories: data.categories ?? [], products: (data.products ?? []).map(toProductCardItem), total: data.total ?? 0 };
   },
 
   /** One published product for its page (everything except related). Public. 404 if missing. */
