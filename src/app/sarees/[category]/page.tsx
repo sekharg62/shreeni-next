@@ -9,11 +9,12 @@ import ProductCard from "@/components/ProductCard";
 import Pagination from "@/components/ui/Pagination";
 import { getCategory, getCategoryFacets, getCategoryProducts, getPrerenderCategorySlugs } from "@/lib/data/catalog";
 import CatalogShell from "@/components/filters/CatalogShell";
+import CatalogSkeleton from "@/components/filters/CatalogSkeleton";
 import { EMPTY_FILTERS, hasFilters, parseFilters, toApiParams, toSearch } from "@/lib/filters";
 import type { CategoryDetail } from "@/types/category";
 import { siteConfig } from "@/config/siteConfig";
 import { pageMetadata, snippet } from "@/lib/seo";
-import { PRODUCT_GRID, ProductCardSkeleton } from "@/components/productGridLayout";
+import { PRODUCT_GRID } from "@/components/productGridLayout";
 
 /** Sentinel used only when the backend is unreachable at build time. */
 const PLACEHOLDER = "__placeholder__";
@@ -90,7 +91,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps<"
           )}
 
           {/* The header above is static; the product grid streams in (it reads ?page=). */}
-          <Suspense fallback={<ProductGridSkeleton />}>
+          <Suspense fallback={<CatalogSkeleton className={hasBanner ? "mt-2" : "mt-10"} />}>
             <CategoryProducts
               slug={category.slug}
               name={category.name}
@@ -195,19 +196,6 @@ async function CategoryProducts({
       <CatalogShell category={slug} filters={filters} facets={facets} total={meta.total}>
         {content}
       </CatalogShell>
-    </div>
-  );
-}
-
-function ProductGridSkeleton() {
-  return (
-    <div aria-hidden="true" className="mt-10">
-      <div className="h-5 w-32 animate-pulse rounded bg-background" />
-      <div className={`mt-8 ${PRODUCT_GRID}`}>
-        {Array.from({ length: 8 }, (_, i) => (
-          <ProductCardSkeleton key={i} />
-        ))}
-      </div>
     </div>
   );
 }

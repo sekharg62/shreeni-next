@@ -9,10 +9,10 @@ export const PRODUCT_GRID = "grid grid-cols-2 gap-x-2 gap-y-5 sm:gap-6 md:grid-c
 export function ProductCardSkeleton({ className = "" }: { className?: string }) {
   return (
     <div aria-hidden="true" className={`overflow-hidden sm:rounded-md sm:border sm:border-border ${className}`}>
-      <div className="aspect-[3/4] animate-pulse bg-surface sm:bg-background" />
+      <div className="aspect-[3/4] animate-pulse bg-border/50" />
       <div className="space-y-2 px-1 pt-2 sm:p-4">
-        <div className="h-4 w-3/4 animate-pulse rounded bg-surface sm:bg-background" />
-        <div className="h-4 w-1/3 animate-pulse rounded bg-surface sm:bg-background" />
+        <div className="h-4 w-3/4 animate-pulse rounded bg-border/60" />
+        <div className="h-4 w-1/3 animate-pulse rounded bg-border/60" />
       </div>
     </div>
   );

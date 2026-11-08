@@ -4,6 +4,7 @@ import { useCallback, useRef, useState, useTransition, type ReactNode } from "re
 import { usePathname, useRouter } from "next/navigation";
 import { ArrowUpDown, SlidersHorizontal, X } from "lucide-react";
 import Accordion from "@/components/product/Accordion";
+import SelectMenu from "@/components/ui/SelectMenu";
 import {
   EMPTY_FILTERS,
   SORTS,
@@ -90,20 +91,13 @@ export default function CatalogShell({ category, filters, facets, total, childre
             <p className="text-sm text-muted" aria-live="polite">
               {pending ? "Updating…" : `${total} ${total === 1 ? "product" : "products"}`}
             </p>
-            <label className="hidden items-center gap-2 text-sm text-muted lg:flex">
-              Sort by
-              <select
-                value={filters.sort}
-                onChange={(e) => change({ sort: e.target.value as Sort })}
-                className="cursor-pointer rounded-md border border-border bg-surface py-1.5 pl-3 pr-8 text-sm font-medium text-dark focus:border-primary focus:outline-none"
-              >
-                {SORTS.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <SelectMenu
+              className="hidden lg:block"
+              label="Sort by"
+              options={SORTS}
+              value={filters.sort}
+              onChange={(sort: Sort) => change({ sort })}
+            />
           </div>
 
           {/* Applied filters */}

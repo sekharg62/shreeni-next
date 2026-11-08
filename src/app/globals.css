@@ -168,3 +168,15 @@ h6 {
 .range-thumb:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgb(101 15 37 / 0.25); }
 .range-thumb:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px rgb(101 15 37 / 0.25); }
 
+
+/* Custom dropdown menus: quick fade + drop */
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.dropdown-in {
+  animation: dropdown-in 0.15s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dropdown-in { animation: none; }
+}
