@@ -66,6 +66,19 @@ export const ENDPOINTS = {
     /** PATCH */
     close: (id: string) => `/me/support-tickets/${encodeURIComponent(id)}/close`,
   },
+  orders: {
+    /** POST { items, couponCode? } — live totals + coupon check for checkout (guest or signed in; saves nothing) */
+    quote: "/checkout/quote",
+    /** POST — place an order (guest or signed in) */
+    place: "/orders",
+    /** POST { orderNumber, contact } — look an order up with the phone/email used (public) */
+    track: "/orders/track",
+    /** GET ?page=&limit= — the signed-in customer's orders */
+    mine: "/me/orders",
+    one: (orderNumber: string) => `/me/orders/${encodeURIComponent(orderNumber)}`,
+    /** POST { reason? } */
+    cancel: (orderNumber: string) => `/me/orders/${encodeURIComponent(orderNumber)}/cancel`,
+  },
   auth: {
     register: "/auth/register",
     /** customers only — the admin panel uses /admin/auth/login */

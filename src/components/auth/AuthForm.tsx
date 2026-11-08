@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Check, Loader2 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import IndiaPhonePrefix from "@/components/ui/IndiaPhonePrefix";
 import AutoHeight from "@/components/ui/AutoHeight";
 import { useAuth } from "@/context/AuthContext";
 import { getApiErrorMessage, getApiErrorStatus } from "@/lib/api";
@@ -220,7 +221,7 @@ export default function AuthForm({ initialMode = "signin", onSuccess }: Props) {
                 type="tel"
                 inputMode="numeric"
                 autoComplete="tel-national"
-                prefix="+91"
+                prefix={<IndiaPhonePrefix />}
                 placeholder="10-digit number"
                 value={fields.phone}
                 // Digits only; pasting "+91 98765 43210" keeps the last 10.

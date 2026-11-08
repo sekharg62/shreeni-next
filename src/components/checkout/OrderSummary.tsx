@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { FREE_SHIPPING_THRESHOLD } from "@/config/constants";
 import { formatINR } from "@/lib/format";
 import type { CartItem } from "@/context/CartContext";
+import type { CheckoutQuote } from "@/types/order";
 
 /** Lines that can't be checked out yet (no size chosen). */
 export const needsSize = (i: CartItem) => !i.variantId && !!i.slug;
@@ -54,29 +54,34 @@ function Lines({ items }: { items: CartItem[] }) {
   );
 }
 
-function Totals({ subtotal }: { subtotal: number }) {
-  const free = subtotal >= FREE_SHIPPING_THRESHOLD;
-  const short = FREE_SHIPPING_THRESHOLD - subtotal;
+/** Totals from the server quote (coupon, shipping); just the subtotal until it arrives. */
+function Totals({ subtotal, quote }: { subtotal: number; quote?: CheckoutQuote | null }) {
+  const total = quote ? quote.grandTotal : subtotal;
   return (
     <dl className="space-y-2 border-t border-border pt-4 text-sm">
       <div className="flex justify-between">
         <dt className="text-muted">Subtotal</dt>
-        <dd className="font-medium text-dark">{formatINR(subtotal)}</dd>
+        <dd className="font-medium text-dark">{formatINR(quote?.subtotal ?? subtotal)}</dd>
       </div>
+      {quote?.coupon && (
+        <div className="flex justify-between text-green-700">
+          <dt>
+            Coupon <span className="font-mono">{quote.coupon.code}</span>
+          </dt>
+          <dd>−{formatINR(quote.coupon.discount)}</dd>
+        </div>
+      )}
       <div className="flex justify-between">
         <dt className="text-muted">Shipping</dt>
-        <dd className={free ? "font-medium text-green-700" : "text-muted"}>{free ? "Free" : "Calculated at payment"}</dd>
+        <dd className={quote && quote.shippingTotal > 0 ? "text-dark" : "font-medium text-green-700"}>
+          {quote && quote.shippingTotal > 0 ? formatINR(quote.shippingTotal) : "Free"}
+        </dd>
       </div>
-      {!free && (
-        <p className="rounded-md bg-background px-3 py-2 text-xs text-dark">
-          Add {formatINR(short)} more for free shipping.
-        </p>
-      )}
       <div className="flex justify-between border-t border-border pt-3 text-base">
         <dt className="font-semibold text-dark">Total</dt>
-        <dd className="font-serif text-lg font-semibold text-dark">{formatINR(subtotal)}</dd>
+        <dd className="font-serif text-lg font-semibold text-dark">{formatINR(total)}</dd>
       </div>
-      <p className="text-xs text-muted">Inclusive of all taxes. Final total is confirmed at payment.</p>
+      <p className="text-xs text-muted">Inclusive of all taxes.</p>
     </dl>
   );
 }
@@ -87,10 +92,12 @@ type SummaryProps = {
   count: number;
   /** "bar": collapsible strip for phones. "sidebar": sticky panel for desktop. */
   variant: "bar" | "sidebar";
+  /** Server totals (coupon, shipping) when available. */
+  quote?: CheckoutQuote | null;
 };
 
 /** Order summary — render the "bar" above the form on phones and the "sidebar" on desktop. */
-export default function OrderSummary({ items, subtotal, count, variant }: SummaryProps) {
+export default function OrderSummary({ items, subtotal, count, variant, quote }: SummaryProps) {
   if (variant === "bar") {
     return (
       <details className="group rounded-lg border border-border bg-surface lg:hidden">
@@ -99,11 +106,11 @@ export default function OrderSummary({ items, subtotal, count, variant }: Summar
             Order summary ({count} item{count === 1 ? "" : "s"})
             <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" aria-hidden="true" />
           </span>
-          <span className="font-serif text-base">{formatINR(subtotal)}</span>
+          <span className="font-serif text-base">{formatINR(quote?.grandTotal ?? subtotal)}</span>
         </summary>
         <div className="px-4 pb-4">
           <Lines items={items} />
-          <Totals subtotal={subtotal} />
+          <Totals subtotal={subtotal} quote={quote} />
         </div>
       </details>
     );
@@ -118,7 +125,7 @@ export default function OrderSummary({ items, subtotal, count, variant }: Summar
         {count} item{count === 1 ? "" : "s"}
       </p>
       <Lines items={items} />
-      <Totals subtotal={subtotal} />
+      <Totals subtotal={subtotal} quote={quote} />
     </aside>
   );
 }

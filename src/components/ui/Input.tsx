@@ -3,14 +3,14 @@
 import { useState, type InputHTMLAttributes, type ReactNode } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
-type InputProps = InputHTMLAttributes<HTMLInputElement> & {
+type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "prefix"> & {
   label: string;
   id: string;
   error?: string;
   /** Helper text under the field (hidden while an error shows). */
   hint?: string;
   /** Optional element rendered inside the field on the left (e.g. a country code). */
-  prefix?: string;
+  prefix?: ReactNode;
   /** Optional element inside the field on the right (e.g. a status icon). */
   suffix?: ReactNode;
 };

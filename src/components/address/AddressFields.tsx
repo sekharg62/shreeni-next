@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CircleAlert, CircleCheck, Loader2 } from "lucide-react";
 import Input from "@/components/ui/Input";
+import IndiaPhonePrefix from "@/components/ui/IndiaPhonePrefix";
 import SearchableSelect from "@/components/ui/SearchableSelect";
 import { INDIAN_STATES } from "@/constants/indianStates";
 import { LABELS, pincodeNotFound, pincodeStateMismatch, type AddressErrors } from "@/lib/address";
@@ -147,7 +148,7 @@ export default function AddressFields({ value, onChange, errors, idPrefix = "add
           type="tel"
           inputMode="numeric"
           autoComplete="tel-national"
-          prefix="+91"
+          prefix={<IndiaPhonePrefix />}
           placeholder="10-digit number"
           value={value.receiverPhone}
           // Pasting "+91 98765 43210" keeps the last 10 digits.

@@ -2,21 +2,29 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, Clock, Lock, Mail, MapPin, Phone, ShoppingBag, Sparkles, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { CheckCircle2, Loader2, Mail, MapPin, Phone, ShoppingBag, Sparkles, User } from "lucide-react";
 import AddressBook from "@/components/address/AddressBook";
 import AddressFields, { focusFirstAddressError } from "@/components/address/AddressFields";
 import Input from "@/components/ui/Input";
+import IndiaPhonePrefix from "@/components/ui/IndiaPhonePrefix";
 import OrderSummary, { needsSize } from "./OrderSummary";
+import PlaceOrderPanel from "./PlaceOrderPanel";
+import { useCheckoutQuote } from "./useCheckoutQuote";
 import { useAuth } from "@/context/AuthContext";
 import { isBlocked, useCart, type CartItem } from "@/context/CartContext";
 import { trackEcommerce } from "@/lib/analytics";
 import { useToast } from "@/context/ToastContext";
+import { getApiErrorMessage, getApiErrorStatus } from "@/lib/api";
 import { addressLines, emptyAddress, formatPhone, validateAddress, type AddressErrors } from "@/lib/address";
+import { saveLastOrder } from "@/lib/lastOrder";
+import { orderService } from "@/services/orderService";
 import type { Address, AddressInput } from "@/types/address";
+import type { PaymentOption } from "@/types/order";
 
 /** Guest details survive a reload (this tab only). */
 const GUEST_KEY = "shreeni_checkout_guest";
-/** What the payment step will pick up later. */
+/** Older builds saved the confirmed delivery choice here; cleared after an order. */
 const DRAFT_KEY = "shreeni_checkout";
 
 type GuestDraft = { email: string; phone: string; address: AddressInput };
@@ -62,8 +70,9 @@ function Section({ step, title, done, children }: { step: number; title: string;
 
 export default function CheckoutView() {
   const { user, status, signOut } = useAuth();
-  const { items, ready, subtotal, itemCount, changed, refresh } = useCart();
+  const { items, ready, subtotal, itemCount, changed, refresh, clearCart } = useCart();
   const toast = useToast();
+  const router = useRouter();
 
   const [guest, setGuest] = useState<GuestDraft | null>(null);
   const [contactErrors, setContactErrors] = useState<ContactErrors>({});
@@ -74,6 +83,13 @@ export default function CheckoutView() {
   const [selectError, setSelectError] = useState(false);
   const guestRef = useRef<HTMLDivElement>(null);
   const reviewRef = useRef<HTMLDivElement>(null);
+  const [payment, setPayment] = useState<PaymentOption>("TEST");
+  const [placing, setPlacing] = useState(false);
+  /** Set once the order exists, so the emptied cart doesn't flash "Your cart is empty" before the redirect. */
+  const [placedNumber, setPlacedNumber] = useState<string | null>(null);
+  /** One key per checkout: retries and double clicks can't create a second order. */
+  const [idempotencyKey] = useState(() => crypto.randomUUID());
+  const { quote, loading: quoteLoading, coupon, couponError, applyCoupon, removeCoupon } = useCheckoutQuote(items, ready && !placedNumber);
 
   // Re-check prices and stock when checkout opens.
   useEffect(() => {
@@ -109,6 +125,15 @@ export default function CheckoutView() {
 
   // Items without a size, or that sold out / went off sale, must be fixed first.
   const blocked = items.filter((i) => needsSize(i) || isBlocked(i));
+
+  if (placedNumber) {
+    return (
+      <div role="status" className="mx-auto flex max-w-md flex-col items-center gap-3 rounded-lg border border-border bg-surface p-10 text-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden="true" />
+        <p className="font-medium text-dark">Order placed! Taking you to your confirmation…</p>
+      </div>
+    );
+  }
 
   /* ───── loading / empty ───── */
   if (!ready || status === "loading" || !guest) {
@@ -183,6 +208,47 @@ export default function CheckoutView() {
     trackEcommerce("add_shipping_info", buyable(items));
   };
 
+  /** Place the order with the details confirmed on the review step. */
+  async function placeOrder() {
+    if (placing || !quote) return;
+    const lines = items.filter((i) => i.variantId && !isBlocked(i)).map((i) => ({ variantId: i.variantId!, quantity: i.quantity }));
+    const contact = signedIn
+      ? { addressId: selected?.id }
+      : {
+          guest: {
+            email: guest!.email.trim(),
+            phone: guest!.phone,
+            address: guest!.address,
+          },
+        };
+    setPlacing(true);
+    trackEcommerce("add_payment_info", buyable(items), { payment_type: payment, ...(coupon && { coupon }) });
+    try {
+      const order = await orderService.place({ items: lines, couponCode: coupon ?? undefined, paymentMethod: payment, idempotencyKey, ...contact });
+      saveLastOrder(order);
+      setPlacedNumber(order.orderNumber);
+      try {
+        window.sessionStorage.removeItem(DRAFT_KEY);
+        window.sessionStorage.removeItem(GUEST_KEY);
+      } catch {
+        /* ignore */
+      }
+      clearCart();
+      router.replace(`/checkout/success/${order.orderNumber}`);
+    } catch (err) {
+      const status = getApiErrorStatus(err);
+      const message = getApiErrorMessage(err, "We couldn't place your order. Please try again.");
+      toast.error(message);
+      if (status === 409) {
+        // Stock or prices changed: reload the cart so the summary shows what can be bought now.
+        refresh();
+      } else if (status === 400 && coupon && /coupon/i.test(message)) {
+        removeCoupon();
+      }
+      setPlacing(false);
+    }
+  }
+
   function saveDraft(data: object) {
     try {
       window.sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ ...data, savedAt: Date.now() }));
@@ -196,7 +262,7 @@ export default function CheckoutView() {
     return (
       <div className="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start">
         <div className="space-y-5">
-          <OrderSummary variant="bar" items={items} subtotal={subtotal} count={itemCount} />
+          <OrderSummary variant="bar" items={items} subtotal={subtotal} count={itemCount} quote={quote} />
           <div ref={reviewRef} tabIndex={-1} className="rounded-lg border border-border bg-surface p-5 outline-none sm:p-6">
             <h2 className="font-serif text-xl font-semibold text-dark">Review your details</h2>
             <dl className="mt-5 grid gap-5 text-sm sm:grid-cols-2">
@@ -226,21 +292,19 @@ export default function CheckoutView() {
             </button>
           </div>
 
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-5 sm:p-6" role="status">
-            <p className="flex items-center gap-2 font-semibold text-amber-800">
-              <Clock className="h-5 w-5" aria-hidden="true" /> Payment &amp; order placement are coming soon
-            </p>
-            <p className="mt-1 text-sm text-amber-900/80">
-              Your cart and delivery details are saved in this browser, so you can pick up right here when payments go live.
-            </p>
-            <button
-              type="button"
-              disabled
-              className="mt-4 inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full bg-primary/50 px-6 py-3.5 text-sm font-semibold uppercase tracking-wider text-surface sm:w-auto"
-            >
-              <Lock className="h-4 w-4" aria-hidden="true" /> Continue to payment
-            </button>
-          </div>
+          <PlaceOrderPanel
+            quote={quote}
+            quoteLoading={quoteLoading}
+            coupon={coupon}
+            couponError={couponError}
+            onApplyCoupon={applyCoupon}
+            onRemoveCoupon={removeCoupon}
+            payment={payment}
+            onPaymentChange={setPayment}
+            placing={placing}
+            disabled={blocked.length > 0}
+            onPlace={() => void placeOrder()}
+          />
           {!signedIn && (
             <p className="text-center text-sm text-muted">
               <Link href="/account?mode=signup&next=/checkout" className="font-semibold text-primary hover:text-secondary">
@@ -250,7 +314,7 @@ export default function CheckoutView() {
             </p>
           )}
         </div>
-        <OrderSummary variant="sidebar" items={items} subtotal={subtotal} count={itemCount} />
+        <OrderSummary variant="sidebar" items={items} subtotal={subtotal} count={itemCount} quote={quote} />
       </div>
     );
   }
@@ -259,7 +323,7 @@ export default function CheckoutView() {
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start">
       <div className="space-y-5">
-        <OrderSummary variant="bar" items={items} subtotal={subtotal} count={itemCount} />
+        <OrderSummary variant="bar" items={items} subtotal={subtotal} count={itemCount} quote={quote} />
 
         {blocked.length > 0 && (
           <p role="alert" className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
@@ -347,7 +411,7 @@ export default function CheckoutView() {
                   type="tel"
                   inputMode="numeric"
                   autoComplete="tel-national"
-                  prefix="+91"
+                  prefix={<IndiaPhonePrefix />}
                   placeholder="10-digit number"
                   value={guest.phone}
                   onChange={(e) => {
@@ -405,7 +469,7 @@ export default function CheckoutView() {
         </div>
       </div>
 
-      <OrderSummary variant="sidebar" items={items} subtotal={subtotal} count={itemCount} />
+      <OrderSummary variant="sidebar" items={items} subtotal={subtotal} count={itemCount} quote={quote} />
     </div>
   );
 }
