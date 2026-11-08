@@ -7,19 +7,7 @@ import Container from "@/components/Container";
 import ProductCard from "@/components/ProductCard";
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
-
-function CardSkeleton() {
-  return (
-    <div aria-hidden="true" className="overflow-hidden rounded-md border border-border bg-surface">
-      <div className="aspect-[3/4] animate-pulse bg-background" />
-      <div className="space-y-2 p-4">
-        <div className="h-4 w-3/4 animate-pulse rounded bg-background" />
-        <div className="h-3 w-1/3 animate-pulse rounded bg-background" />
-        <div className="mt-4 h-9 animate-pulse rounded-full bg-background" />
-      </div>
-    </div>
-  );
-}
+import { PRODUCT_GRID, ProductCardSkeleton } from "@/components/productGridLayout";
 
 export default function WishlistPage() {
   const { items, count, status, synced, reload } = useWishlist();
@@ -86,9 +74,9 @@ export default function WishlistPage() {
         )}
 
         {loading && count === 0 ? (
-          <div className="mt-10 grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4" aria-busy="true">
+          <div className={`mt-10 ${PRODUCT_GRID}`} aria-busy="true">
             {Array.from({ length: 4 }, (_, i) => (
-              <CardSkeleton key={i} />
+              <ProductCardSkeleton key={i} />
             ))}
           </div>
         ) : count === 0 ? (
@@ -109,7 +97,7 @@ export default function WishlistPage() {
           )
         ) : (
           <div
-            className={`mt-10 grid grid-cols-2 gap-6 transition-opacity md:grid-cols-3 lg:grid-cols-4 ${loading ? "opacity-60" : ""}`}
+            className={`mt-10 ${PRODUCT_GRID} transition-opacity ${loading ? "opacity-60" : ""}`}
             aria-busy={loading}
           >
             {items.map((product) => (

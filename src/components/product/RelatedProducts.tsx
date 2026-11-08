@@ -1,5 +1,6 @@
 import ProductCard from "@/components/ProductCard";
 import { getRelatedProducts } from "@/lib/data/catalog";
+import { ProductCardSkeleton } from "@/components/productGridLayout";
 
 /** "You may also like" — loaded separately so it never delays the product itself. */
 export default async function RelatedProducts({ slug }: { slug: string }) {
@@ -12,10 +13,10 @@ export default async function RelatedProducts({ slug }: { slug: string }) {
         You may also like
       </h2>
       <div className="mt-2 h-0.5 w-16 bg-secondary" />
-      {/* Phones: swipeable row. Desktop: 4-column grid. */}
-      <ul className="-mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-6 sm:overflow-visible sm:px-0 lg:grid-cols-4">
+      {/* Phones: swipeable row, ~2¼ cards so the next one peeks in. Tablet/desktop: grid. */}
+      <ul className="-mx-4 mt-6 flex snap-x snap-mandatory gap-2 overflow-x-auto scroll-px-4 px-4 pb-2 sm:mx-0 sm:mt-8 sm:grid sm:grid-cols-3 sm:gap-6 sm:overflow-visible sm:px-0 lg:grid-cols-4">
         {items.map((p) => (
-          <li key={p.id} className="w-[70%] shrink-0 snap-start sm:w-auto">
+          <li key={p.id} className="w-[44%] shrink-0 snap-start sm:w-auto">
             <ProductCard product={p} />
           </li>
         ))}
@@ -28,15 +29,9 @@ export function RelatedProductsSkeleton() {
   return (
     <div aria-hidden="true">
       <div className="h-8 w-56 animate-pulse rounded bg-background" />
-      <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-2 gap-x-2 sm:mt-8 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
         {Array.from({ length: 4 }, (_, i) => (
-          <div key={i} className={`overflow-hidden rounded-md border border-border ${i > 1 ? "hidden sm:block" : ""}`}>
-            <div className="aspect-[3/4] animate-pulse bg-background" />
-            <div className="space-y-2 p-4">
-              <div className="h-4 w-3/4 animate-pulse rounded bg-background" />
-              <div className="h-4 w-1/3 animate-pulse rounded bg-background" />
-            </div>
-          </div>
+          <ProductCardSkeleton key={i} className={i > 1 ? "hidden sm:block" : ""} />
         ))}
       </div>
     </div>

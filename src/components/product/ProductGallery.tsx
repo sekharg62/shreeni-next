@@ -27,7 +27,7 @@ export default function ProductGallery({ images, name, soldOut = false }: Props)
     return (
       <div
         aria-hidden="true"
-        className="flex aspect-[3/4] w-full items-center justify-center rounded-lg bg-gradient-to-br from-primary/90 via-primary to-dark"
+        className="-mx-4 flex aspect-[3/4] items-center justify-center bg-gradient-to-br sm:mx-0 sm:w-full sm:rounded-lg from-primary/90 via-primary to-dark"
       >
         <span className="font-serif text-8xl font-semibold text-surface/80">{name.charAt(0)}</span>
       </div>
@@ -55,7 +55,8 @@ export default function ProductGallery({ images, name, soldOut = false }: Props)
     "absolute top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-surface/85 text-dark shadow transition hover:bg-surface sm:flex";
 
   return (
-    <div className="flex flex-col gap-3 lg:flex-row-reverse">
+    // Phones: the photo runs edge to edge (cancels the page's 16px side padding). From 640px: framed.
+    <div className="-mx-4 flex flex-col gap-2 sm:mx-0 sm:gap-3 lg:flex-row-reverse">
       <div
         role="region"
         aria-roledescription="carousel"
@@ -66,7 +67,7 @@ export default function ProductGallery({ images, name, soldOut = false }: Props)
         onPointerUp={onUp}
         onPointerCancel={() => (startX.current = null)}
         title="Click to view full screen"
-        className="relative aspect-[3/4] w-full cursor-zoom-in touch-pan-y overflow-hidden rounded-lg bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary lg:flex-1"
+        className="relative aspect-[3/4] w-full cursor-zoom-in touch-pan-y overflow-hidden bg-background focus-visible:outline-none sm:rounded-lg focus-visible:ring-2 focus-visible:ring-primary lg:flex-1"
       >
         {images.map((src, i) => (
           <Image
@@ -110,7 +111,7 @@ export default function ProductGallery({ images, name, soldOut = false }: Props)
       </div>
 
       {count > 1 && (
-        <ul className="flex gap-2 overflow-x-auto pb-1 lg:w-20 lg:flex-col lg:overflow-visible lg:pb-0">
+        <ul className="flex gap-2 overflow-x-auto px-4 pb-1 sm:px-0 lg:w-20 lg:flex-col lg:overflow-visible lg:pb-0">
           {images.map((src, i) => (
             <li key={src} className="shrink-0">
               <button
@@ -118,7 +119,7 @@ export default function ProductGallery({ images, name, soldOut = false }: Props)
                 onClick={() => go(i)}
                 aria-label={`Show photo ${i + 1}`}
                 aria-current={i === index ? "true" : undefined}
-                className={`relative block aspect-[3/4] w-16 overflow-hidden rounded-md border-2 transition-colors lg:w-20 ${
+                className={`relative block aspect-[3/4] w-16 overflow-hidden rounded-sm border-2 sm:rounded-md transition-colors lg:w-20 ${
                   i === index ? "border-primary" : "border-transparent opacity-70 hover:opacity-100"
                 }`}
               >

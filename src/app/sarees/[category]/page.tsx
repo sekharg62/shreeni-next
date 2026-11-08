@@ -11,6 +11,7 @@ import { getCategory, getCategoryProducts, getPrerenderCategorySlugs } from "@/l
 import type { CategoryDetail } from "@/types/category";
 import { siteConfig } from "@/config/siteConfig";
 import { pageMetadata, snippet } from "@/lib/seo";
+import { PRODUCT_GRID, ProductCardSkeleton } from "@/components/productGridLayout";
 
 /** Sentinel used only when the backend is unreachable at build time. */
 const PLACEHOLDER = "__placeholder__";
@@ -140,7 +141,7 @@ async function CategoryProducts({
           ? `${meta.total} ${meta.total === 1 ? "product" : "products"}`
           : `Showing ${from}–${to} of ${meta.total} products`}
       </p>
-      <ul className="mt-8 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
+      <ul className={`mt-8 ${PRODUCT_GRID}`}>
         {items.map((p) => (
           <li key={p.id}>
             <ProductCard product={p} />
@@ -160,15 +161,9 @@ function ProductGridSkeleton() {
   return (
     <div aria-hidden="true" className="mt-10">
       <div className="h-5 w-32 animate-pulse rounded bg-background" />
-      <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
+      <div className={`mt-8 ${PRODUCT_GRID}`}>
         {Array.from({ length: 8 }, (_, i) => (
-          <div key={i} className="overflow-hidden rounded-md border border-border">
-            <div className="aspect-[3/4] animate-pulse bg-background" />
-            <div className="space-y-2 p-4">
-              <div className="h-4 w-3/4 animate-pulse rounded bg-background" />
-              <div className="h-4 w-1/3 animate-pulse rounded bg-background" />
-            </div>
-          </div>
+          <ProductCardSkeleton key={i} />
         ))}
       </div>
     </div>

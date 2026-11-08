@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { ProductColor, ProductDetail, ProductSpec } from "@/types/product";
+import Accordion from "./Accordion";
 import { paragraphs } from "./ProductStory";
 
 /** 550 → "5.5 m"; 115 → "1.15 m" (sarees are measured in metres). */
@@ -24,15 +25,6 @@ function DefinitionTable({ rows }: { rows: Row[] }) {
         </div>
       ))}
     </dl>
-  );
-}
-
-function Block({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div>
-      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-dark">{title}</h3>
-      {children}
-    </div>
   );
 }
 
@@ -94,21 +86,22 @@ export default function ProductDetails({ product }: { product: ProductDetail }) 
           ))}
         </div>
 
-        <div className="space-y-8">
+        {/* Tap a heading to see more; all closed by default. */}
+        <div className="self-start border-t border-border">
           {factRows.length > 0 && (
-            <Block title="Product details">
+            <Accordion title="Product details">
               <DefinitionTable rows={factRows} />
-            </Block>
+            </Accordion>
           )}
           {specifications.details.length > 0 && (
-            <Block title="Specifications">
+            <Accordion title="Specifications" count={specifications.details.length}>
               <DefinitionTable rows={specRows(specifications.details)} />
-            </Block>
+            </Accordion>
           )}
           {makerRows.length > 0 && (
-            <Block title="Manufacturing & legal">
+            <Accordion title="Manufacturing & legal">
               <DefinitionTable rows={makerRows} />
-            </Block>
+            </Accordion>
           )}
         </div>
       </div>

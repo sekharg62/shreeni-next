@@ -23,7 +23,8 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
 
   return (
     // h-full: every card in a grid row is as tall as the tallest one.
-    <div className="group flex h-full flex-col overflow-hidden rounded-md border border-border bg-surface">
+    // Phones: borderless, square, photo-first (more products per screen). From 640px: framed card.
+    <div className="group flex h-full flex-col overflow-hidden sm:rounded-md sm:border sm:border-border sm:bg-surface">
       <div className="relative aspect-[3/4] overflow-hidden">
         {/* Whole photo opens the product (skipped by keyboard: the name link below does the same). */}
         {href && (
@@ -53,7 +54,7 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
 
         {/* Out of stock: diagonal ribbon across the top-left corner (the photo box clips its ends). */}
         {outOfStock && (
-          <span className="pointer-events-none absolute -left-9 top-5 z-[2] w-36 -rotate-45 bg-primary py-1 text-center text-[10px] font-semibold uppercase tracking-wider text-surface shadow-md">
+          <span className="pointer-events-none absolute -left-8 top-4 z-[2] w-32 -rotate-45 bg-primary py-0.5 text-center text-[9px] font-semibold uppercase tracking-wider text-surface shadow-md sm:-left-9 sm:top-5 sm:w-36 sm:py-1 sm:text-[10px]">
             Out of Stock
           </span>
         )}
@@ -64,10 +65,10 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
           onClick={toggleWishlist}
           aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           aria-pressed={wishlisted}
-          className="absolute right-3 top-3 z-[2] flex h-9 w-9 items-center justify-center rounded-full bg-surface/90 text-dark shadow-sm backdrop-blur transition-colors hover:text-red-500"
+          className="absolute right-2 top-2 z-[2] flex h-8 w-8 items-center justify-center rounded-full sm:right-3 sm:top-3 sm:h-9 sm:w-9 bg-surface/90 text-dark shadow-sm backdrop-blur transition-colors hover:text-red-500"
         >
           <Heart
-            className={`h-5 w-5 transition-colors ${
+            className={`h-4 w-4 sm:h-5 sm:w-5 transition-colors ${
               wishlisted ? `fill-red-500 text-red-500 ${tapped ? "heart-pop" : ""}` : ""
             }`}
             aria-hidden="true"
@@ -75,9 +76,12 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
         </button>
       </div>
 
-      <div className="flex flex-1 flex-col p-4">
+      <div className="flex flex-1 flex-col px-1 pt-2 sm:p-4">
         {/* Always 2 lines tall (longer names end in "…"), so prices and buttons line up across a row. */}
-        <h3 className="line-clamp-2 min-h-[2lh] font-serif text-lg font-semibold text-dark" title={product.name}>
+        <h3
+          className="line-clamp-2 min-h-[2lh] font-serif text-sm font-semibold leading-snug text-dark sm:text-lg sm:leading-normal"
+          title={product.name}
+        >
           {href ? (
             <Link href={href} className="transition-colors hover:text-primary">
               {product.name}
@@ -86,7 +90,7 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
             product.name
           )}
         </h3>
-        <p className="mt-1 flex flex-wrap items-baseline gap-x-2 text-sm">
+        <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5 text-[13px] sm:gap-x-2 sm:text-sm">
           <span className="font-medium text-secondary">
             {formatINR(product.price)}
           </span>
@@ -96,15 +100,15 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
                 <span className="sr-only">Original price </span>
                 {formatINR(product.compareAtPrice)}
               </span>
-              <span className="text-xs font-semibold text-green-700">
+              <span className="text-[11px] font-semibold text-green-700 sm:text-xs">
                 {Math.round((1 - product.price / product.compareAtPrice) * 100)}% off
               </span>
             </>
           )}
         </p>
 
-        {/* Actions */}
-        <div className="mt-auto flex flex-col gap-2 pt-4">
+        {/* Actions — desktop/tablet only. On phones the whole photo and name are the tap target. */}
+        <div className="mt-auto hidden flex-col gap-2 pt-4 sm:flex">
           {href && outOfStock ? (
             // Sold out: still worth a look (wishlist, share), but don't suggest it can be bought.
             <Link

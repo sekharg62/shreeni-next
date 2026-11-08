@@ -1,6 +1,7 @@
 import Container from "@/components/Container";
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/data/products";
+import { PRODUCT_GRID } from "@/components/productGridLayout";
 
 type ProductGridProps = {
   title: string;
@@ -31,7 +32,7 @@ export default function ProductGrid({
             No products found in this collection yet.
           </p>
         ) : (
-          <div className="mt-10 grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+          <div className={`mt-10 ${PRODUCT_GRID}`}>
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

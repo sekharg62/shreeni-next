@@ -133,14 +133,14 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
         <ProductStory story={product.story} />
         <ProductDetails product={product} />
 
-        {/* Third API call: approved reviews, streams in after the product */}
-        <Suspense fallback={<ProductReviewsSkeleton />}>
-          <ProductReviews slug={product.slug} productName={product.name} />
-        </Suspense>
-
-        {/* Related products: streams in after the product */}
+        {/* Related products ("You may also like"): streams in after the product */}
         <Suspense fallback={<RelatedProductsSkeleton />}>
           <RelatedProducts slug={product.slug} />
+        </Suspense>
+
+        {/* Approved reviews: streams in after the product */}
+        <Suspense fallback={<ProductReviewsSkeleton />}>
+          <ProductReviews slug={product.slug} productName={product.name} />
         </Suspense>
       </Container>
     </>
