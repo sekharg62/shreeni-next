@@ -12,7 +12,7 @@ import { SearchButton } from "@/components/search/SearchDialog";
 export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-surface/90 backdrop-blur">
-      <Container className="flex h-20 items-center justify-between gap-4">
+      <Container className="flex h-16 items-center justify-between gap-4 sm:h-[72px]">
         {/* Brand */}
         <Link href="/" aria-label={`${siteConfig.name} — Home`} className="flex shrink-0 items-center">
           <Image
@@ -22,7 +22,7 @@ export default function Header() {
             height={347}
             priority
             unoptimized
-            className="h-12 w-auto sm:h-14"
+            className="h-10 w-auto sm:h-12"
           />
         </Link>
 

@@ -122,13 +122,27 @@ const FEATURED_SIZES =
  * Editorial category card: poster with a gold inner frame, name and tagline on a dark fade,
  * piece count and starting price. `featured` is the large mosaic card on the homepage.
  */
+/**
+ * Homepage mosaic (phones and desktop): a bigger radius on one outer corner of the whole block
+ * (top-left of the big card, bottom-right of the last small card). Everything else keeps rounded-lg.
+ * The gold inner frame follows with a radius smaller by its inset, so the two curves stay parallel.
+ */
+const ACCENT_CORNER = {
+  // Frame inset is 8px on phones, 12px from 640px: 40px - inset.
+  tl: { card: "rounded-tl-[2.5rem]", frame: "rounded-tl-[2rem] sm:rounded-tl-[1.75rem]" },
+  br: { card: "rounded-br-[2.5rem]", frame: "rounded-br-[2rem] sm:rounded-br-[1.75rem]" },
+} as const;
+
 export function CategoryTile({
   category,
   featured = false,
+  accentCorner,
 }: {
   category: CategoryCard;
   featured?: boolean;
+  accentCorner?: keyof typeof ACCENT_CORNER;
 }) {
+  const accent = accentCorner ? ACCENT_CORNER[accentCorner] : null;
   const { name, slug, posterUrl, tagline, minPrice, maxDiscountPercent } =
     category;
   // No price means nothing is on sale in this category yet.
@@ -141,7 +155,7 @@ export function CategoryTile({
   return (
     <Link
       href={`/sarees/${slug}`}
-      className={`group relative block h-full w-full overflow-hidden rounded-lg bg-dark shadow-sm ring-offset-2 ring-offset-surface transition-shadow duration-300 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+      className={`group relative block h-full w-full overflow-hidden rounded-lg ${accent?.card ?? ""} bg-dark shadow-sm ring-offset-2 ring-offset-surface transition-shadow duration-300 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
         featured ? "aspect-[4/5] sm:aspect-auto sm:min-h-full" : "aspect-[3/4]"
       }`}
     >
@@ -175,7 +189,7 @@ export function CategoryTile({
       {/* Gold inner frame */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-2 rounded-md border border-secondary/45 transition-colors duration-300 group-hover:border-secondary sm:inset-3"
+        className={`pointer-events-none absolute inset-2 rounded-md ${accent?.frame ?? ""} border border-secondary/45 transition-colors duration-300 group-hover:border-secondary sm:inset-3`}
       />
 
       <div className="absolute inset-x-0 bottom-0 flex flex-col">
@@ -261,11 +275,12 @@ function CategoryMosaic({ categories }: { categories: CategoryCard[] }) {
     <div className="space-y-4 sm:space-y-6">
       <ul className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
         <li className="col-span-2 sm:row-span-2">
-          <CategoryTile category={first} featured />
+          <CategoryTile category={first} featured accentCorner="tl" />
         </li>
-        {beside.map((c) => (
+        {beside.map((c, i) => (
           <li key={c.slug}>
-            <CategoryTile category={c} />
+            {/* The 5th card is the block's bottom-right corner on every screen size. */}
+            <CategoryTile category={c} accentCorner={i === 3 ? "br" : undefined} />
           </li>
         ))}
       </ul>
