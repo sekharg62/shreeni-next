@@ -63,7 +63,7 @@ export async function getPrerenderCategorySlugs(): Promise<string[]> {
   "use cache";
   cacheTag(CACHE_TAGS.categories);
   try {
-    const list = await categoryService.children({ slug: CATEGORY_SLUGS.homeTopCategoriesParent });
+    const list = await categoryService.allChildren(CATEGORY_SLUGS.homeTopCategoriesParent);
     cacheLife("minutes");
     return list.map((c) => c.slug);
   } catch {

@@ -1,3 +1,5 @@
+import type { Paginated } from "./api";
+
 /** A sub-category card, as returned by `GET /categories/children?slug=…`. */
 export type CategoryCard = {
   name: string;
@@ -16,10 +18,14 @@ export type CategoryCard = {
 export type CategoryChildrenParams = {
   /** Slug of the parent category, e.g. "saree". */
   slug: string;
+  /** Page number, starting at 1 (backend default 1). */
+  page?: number;
+  /** Cards per page, max 50 (backend default 10). */
+  limit?: number;
 };
 
-/** `GET /categories/children` response body: published children in display order. */
-export type CategoryChildrenResponse = CategoryCard[];
+/** `GET /categories/children` response body: one page of published children, in display order. */
+export type CategoryChildrenResponse = Paginated<CategoryCard>;
 
 /** A parent shown in the breadcrumb. `slug` is null when that parent isn't published (not linkable). */
 export type CategoryCrumb = {
