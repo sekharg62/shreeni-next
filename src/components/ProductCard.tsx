@@ -35,7 +35,9 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
 
   return (
     // h-full: every card in a grid row is as tall as the tallest one.
-    <div className="group flex h-full flex-col">
+    // relative: keeps the hidden screen-reader labels (absolutely positioned) inside the card, so in a
+    // swipe row they're clipped with it instead of widening the whole page.
+    <div className="group relative flex h-full flex-col">
       <div className="relative aspect-[3/4] overflow-hidden rounded-md bg-border/40">
         {/* Whole photo opens the product (skipped by keyboard: the name link below does the same). */}
         {href && <Link href={href} tabIndex={-1} aria-hidden="true" className="absolute inset-0 z-[1]" />}

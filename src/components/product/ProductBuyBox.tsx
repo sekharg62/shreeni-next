@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Check, Heart, ShoppingBag } from "lucide-react";
 import QuantityStepper from "@/components/ui/QuantityStepper";
@@ -65,6 +66,8 @@ export default function ProductBuyBox({
   const [heartTapped, setHeartTapped] = useState(false);
   const [added, setAdded] = useState(false);
   const [showBar, setShowBar] = useState(false);
+  /** The bar is put on the page (in <body>) the first time it's needed, then just slides in/out. */
+  const [barMounted, setBarMounted] = useState(false);
   const actionsRef = useRef<HTMLDivElement>(null);
   const sizeRef = useRef<HTMLDivElement>(null);
 
@@ -82,7 +85,9 @@ export default function ProductBuyBox({
     const el = actionsRef.current;
     if (!el || soldOut) return;
     const io = new IntersectionObserver(([entry]) => {
-      setShowBar(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+      const past = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+      setShowBar(past);
+      if (past) setBarMounted(true);
     });
     io.observe(el);
     return () => io.disconnect();
@@ -243,27 +248,31 @@ export default function ProductBuyBox({
         )}
       </div>
 
-      {/* Phones: sticky price + Add to bag once the main buttons are scrolled past. */}
-      {!soldOut && (
-        <div
-          aria-hidden={!showBar}
-          inert={!showBar}
-          className={`fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-8px_24px_-12px_rgba(50,21,27,0.35)] backdrop-blur-md transition-transform duration-300 ease-out motion-reduce:transition-none lg:hidden ${
-            showBar ? "translate-y-0" : "translate-y-full"
-          }`}
-        >
-          <div className="flex items-center gap-3">
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-xs text-muted">{variant ? `Size: ${variant.size}` : name}</p>
-              <p className="text-lg font-semibold text-primary">{formatINR(shownPrice)}</p>
+      {/* Phones: sticky price + Add to bag once the main buttons are scrolled past. Rendered straight
+          into <body>, so no transformed/animated parent can trap this fixed bar inside the page. */}
+      {!soldOut &&
+        barMounted &&
+        createPortal(
+          <div
+            aria-hidden={!showBar}
+            inert={!showBar}
+            className={`fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-8px_24px_-12px_rgba(50,21,27,0.35)] backdrop-blur-md transition-transform duration-300 ease-out motion-reduce:transition-none lg:hidden ${
+              showBar ? "translate-y-0" : "translate-y-full"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs text-muted">{variant ? `Size: ${variant.size}` : name}</p>
+                <p className="text-lg font-semibold text-primary">{formatINR(shownPrice)}</p>
+              </div>
+              <button type="button" onClick={addToBag} className={`${primaryBtn} h-12 shrink-0`}>
+                {added ? <Check className="h-4 w-4" aria-hidden="true" /> : <ShoppingBag className="h-4 w-4" aria-hidden="true" />}
+                {added ? "Added" : variant ? "Add to bag" : "Choose size"}
+              </button>
             </div>
-            <button type="button" onClick={addToBag} className={`${primaryBtn} h-12 shrink-0`}>
-              {added ? <Check className="h-4 w-4" aria-hidden="true" /> : <ShoppingBag className="h-4 w-4" aria-hidden="true" />}
-              {added ? "Added" : variant ? "Add to bag" : "Choose size"}
-            </button>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

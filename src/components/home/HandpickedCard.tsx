@@ -20,7 +20,8 @@ export default function HandpickedCard({ product, position }: { product: Product
   return (
     <Link
       href={href}
-      className="group block rounded-t-full text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-4 focus-visible:ring-offset-dark"
+      // relative: keeps the hidden screen-reader label inside the card (see ProductCard).
+      className="group relative block rounded-t-full text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-4 focus-visible:ring-offset-dark"
     >
       <div className="relative">
         {/* Outer gold line of the arch, a little apart from the photo. */}

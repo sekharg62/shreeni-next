@@ -54,7 +54,7 @@ export default async function ProductReviews({ slug, productName }: Props) {
           <ReviewList slug={slug} initial={page.data} total={page.meta.total} />
         </div>
       ) : (
-        <div className="mx-auto mt-8 max-w-2xl">
+        <div className="mt-8 w-full">
           <div className="mb-6 text-center">
             <MessageSquareText className="mx-auto h-8 w-8 text-secondary" aria-hidden="true" />
             <p className="mt-3 font-serif text-xl font-semibold text-dark">No reviews yet</p>

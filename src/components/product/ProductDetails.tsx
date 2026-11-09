@@ -71,8 +71,9 @@ export default function ProductDetails({ product }: { product: ProductDetail }) 
     <section aria-labelledby="details-heading">
       <SectionTitle id="details-heading" eyebrow="About this saree" title="Details & care" />
 
-      <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-16">
-        <div className="max-w-prose space-y-4 text-[15px] leading-relaxed text-dark/85 first-letter:float-left first-letter:mr-2 first-letter:font-serif first-letter:text-5xl first-letter:leading-[0.9] first-letter:text-primary">
+      {/* Two equal halves on desktop; one full-width column on phones and tablets. */}
+      <div className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-16">
+        <div className="w-full space-y-4 text-[15px] leading-relaxed text-dark/85 first-letter:float-left first-letter:mr-2 first-letter:font-serif first-letter:text-5xl first-letter:leading-[0.9] first-letter:text-primary">
           {paragraphs(product.description).map((p, i) => (
             <p key={i} className="whitespace-pre-line">
               {p}
