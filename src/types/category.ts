@@ -4,6 +4,12 @@ export type CategoryCard = {
   slug: string;
   /** Portrait image (≈3:4); null when none was uploaded in the admin. */
   posterUrl: string | null;
+  /** One short line under the name, e.g. "Mythology woven in silk". */
+  tagline: string | null;
+  /** Lowest selling price in paise; null when the category is empty. */
+  minPrice: number | null;
+  /** Biggest % off right now (0 = nothing on sale). */
+  maxDiscountPercent: number;
 };
 
 /** Query for `GET /categories/children`. */

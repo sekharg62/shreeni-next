@@ -46,7 +46,7 @@ async function Weaves() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd(categories)).replace(/</g, "\\u003c") }}
       />
-      <ul className="mt-12 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4">
+      <ul className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
         {categories.map((c) => (
           <li key={c.slug}>
             <CategoryTile category={c} />
@@ -59,12 +59,9 @@ async function Weaves() {
 
 function WeavesSkeleton() {
   return (
-    <div aria-hidden="true" className="mt-12 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4">
+    <div aria-hidden="true" className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
       {Array.from({ length: 8 }, (_, i) => (
-        <div key={i} className="space-y-3">
-          <div className="aspect-[3/4] animate-pulse rounded-lg bg-border/50" />
-          <div className="mx-auto h-4 w-24 animate-pulse rounded bg-border/60" />
-        </div>
+        <div key={i} className="aspect-[3/4] animate-pulse rounded-lg bg-border/50" />
       ))}
     </div>
   );

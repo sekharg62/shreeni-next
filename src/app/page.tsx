@@ -65,7 +65,8 @@ function HeroFallback() {
 function TopCategoriesFallback() {
   return (
     <div aria-hidden="true" className="bg-surface py-20 sm:py-24">
-      <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-x-4 gap-y-10 px-4 sm:grid-cols-4 sm:gap-x-6 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-4 px-4 sm:grid-cols-4 sm:gap-6 sm:px-6 lg:px-8">
+        <div className="col-span-2 aspect-[4/5] animate-pulse rounded-lg bg-background sm:row-span-2 sm:aspect-auto" />
         {Array.from({ length: 4 }, (_, i) => (
           <div key={i} className="aspect-[3/4] animate-pulse rounded-lg bg-background" />
         ))}
