@@ -180,3 +180,14 @@ h6 {
 @media (prefers-reduced-motion: reduce) {
   .dropdown-in { animation: none; }
 }
+
+/* Hero carousel: active dot fills while its slide is showing */
+@keyframes hero-progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+.hero-progress {
+  animation-name: hero-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}

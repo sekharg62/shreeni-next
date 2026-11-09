@@ -59,7 +59,11 @@ const siteJsonLd = {
 };
 
 function HeroFallback() {
-  return <div aria-hidden="true" className="aspect-[4/5] w-full animate-pulse bg-dark/10 sm:aspect-[8/3] sm:max-h-[80vh]" />;
+  return (
+    <div aria-hidden="true" className="mx-auto w-full max-w-[1440px] sm:px-6 sm:pt-4 lg:px-8 lg:pt-6">
+      <div className="aspect-[4/5] w-full animate-pulse bg-dark/10 sm:aspect-[8/3] sm:max-h-[75vh] sm:rounded-2xl" />
+    </div>
+  );
 }
 
 function TopCategoriesFallback() {
