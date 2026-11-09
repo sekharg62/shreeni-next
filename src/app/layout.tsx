@@ -3,6 +3,7 @@ import { GoogleTagManager } from "@next/third-parties/google";
 import { Fraunces, Outfit } from "next/font/google";
 import "./globals.css";
 import AnnouncementBar from "@/components/AnnouncementBar";
+import PreviewBanner from "@/components/PreviewBanner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
@@ -90,6 +91,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <AuthProvider>
         <CartProvider>
           <WishlistProvider>
+            <PreviewBanner />
             <AnnouncementBar />
             <Header />
             <main className="flex-1">{children}</main>

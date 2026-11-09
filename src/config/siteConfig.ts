@@ -44,6 +44,16 @@ export const siteConfig = {
     googleSiteVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
   },
 
+  // --- Launch ---
+  launch: {
+    /**
+     * Pre-launch preview: shows the "launching soon" strip and locks "Place order".
+     * The site stays indexable for SEO. Set NEXT_PUBLIC_PREVIEW_MODE=false on launch day.
+     */
+    preview: process.env.NEXT_PUBLIC_PREVIEW_MODE !== "false",
+    message: "We're launching soon! Shreeni is in preview — browse freely, orders open shortly.",
+  },
+
   // --- Analytics ---
   analytics: {
     /** Google Tag Manager container. Override with NEXT_PUBLIC_GTM_ID; set it to "" to turn tracking off. */
