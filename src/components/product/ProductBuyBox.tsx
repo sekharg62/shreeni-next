@@ -81,16 +81,30 @@ export default function ProductBuyBox({
   const wishlisted = isWishlisted(productId);
 
   // Sticky bar (phones): only after the shopper has scrolled past the main buttons.
+  // A scroll check (at most once per frame) rather than an IntersectionObserver: a fast fling can
+  // jump the buttons from below the screen to above it without ever "intersecting", and then an
+  // observer never fires.
   useEffect(() => {
     const el = actionsRef.current;
     if (!el || soldOut) return;
-    const io = new IntersectionObserver(([entry]) => {
-      const past = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const past = el.getBoundingClientRect().bottom < 0;
       setShowBar(past);
       if (past) setBarMounted(true);
-    });
-    io.observe(el);
-    return () => io.disconnect();
+    };
+    const onScroll = () => {
+      if (!raf) raf = window.requestAnimationFrame(update);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
   }, [soldOut]);
 
   // "Added ✓" fades back to "Add to bag".
