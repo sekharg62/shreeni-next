@@ -10,7 +10,7 @@ type Props = {
   error?: string | null;
 };
 
-/** Size pills as a radio group. Sold-out sizes stay visible but can't be picked. */
+/** Size options as a radio group. Sold-out sizes stay visible (struck through) but can't be picked. */
 export default function SizeSelector({ variants, value, onChange, error }: Props) {
   const selected = variants.find((v) => v.id === value);
   return (
@@ -31,12 +31,14 @@ export default function SizeSelector({ variants, value, onChange, error }: Props
               aria-label={soldOut ? `${v.size}, sold out` : v.size}
               disabled={soldOut}
               onClick={() => onChange(v.id)}
-              className={`min-w-14 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+              className={`h-11 min-w-16 rounded-md border px-4 text-sm font-medium transition-[border-color,background-color,box-shadow,color] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                 active
-                  ? "border-primary bg-primary text-surface"
+                  ? "border-primary bg-primary/5 text-primary shadow-[inset_0_0_0_1px_var(--color-primary)]"
                   : soldOut
-                    ? "cursor-not-allowed border-border text-muted line-through opacity-60"
-                    : "border-border text-dark hover:border-primary"
+                    ? "cursor-not-allowed border-border bg-background text-muted line-through opacity-60"
+                    : error
+                      ? "border-red-300 text-dark hover:border-primary"
+                      : "border-border text-dark hover:border-dark"
               }`}
             >
               {v.size}

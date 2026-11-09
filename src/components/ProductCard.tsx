@@ -3,16 +3,28 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { ArrowRight, Heart } from "lucide-react";
 import type { ProductCardItem } from "@/types/product";
 import { formatINR } from "@/lib/format";
 import { useWishlist } from "@/context/WishlistContext";
 
+const SIZES = "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw";
+/** Smallest discount worth a tag on the photo (same rule as the category badges). */
+const MIN_TAG_PERCENT = 5;
+
+/**
+ * Boutique-style product card: borderless, photo first, no buttons at rest.
+ * Desktop hover: the second photo crossfades in and a frosted "View saree" bar slides up.
+ * Phones: the whole photo and name are the tap target.
+ */
 export default function ProductCard({ product }: { product: ProductCardItem }) {
   const { isWishlisted, toggle } = useWishlist();
   const wishlisted = isWishlisted(product.id);
   const outOfStock = product.inStock === false;
   const href = product.slug ? `/products/${product.slug}` : null;
+  const onSale = product.compareAtPrice != null && product.compareAtPrice > product.price;
+  const percentOff = onSale ? Math.round((1 - product.price / product.compareAtPrice!) * 100) : 0;
+  const hoverImage = product.image && product.hoverImage && product.hoverImage !== product.image ? product.hoverImage : null;
 
   // Pop the heart only when the shopper saves it (not for hearts already filled on load).
   const [tapped, setTapped] = useState(false);
@@ -23,119 +35,127 @@ export default function ProductCard({ product }: { product: ProductCardItem }) {
 
   return (
     // h-full: every card in a grid row is as tall as the tallest one.
-    // Phones: borderless, square, photo-first (more products per screen). From 640px: framed card.
-    <div className="group flex h-full flex-col overflow-hidden sm:rounded-md sm:border sm:border-border sm:bg-surface">
-      <div className="relative aspect-[3/4] overflow-hidden">
+    <div className="group flex h-full flex-col">
+      <div className="relative aspect-[3/4] overflow-hidden rounded-md bg-border/40">
         {/* Whole photo opens the product (skipped by keyboard: the name link below does the same). */}
-        {href && (
-          <Link href={href} tabIndex={-1} aria-hidden="true" className="absolute inset-0 z-[1]" />
-        )}
+        {href && <Link href={href} tabIndex={-1} aria-hidden="true" className="absolute inset-0 z-[1]" />}
+
         {product.image ? (
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className={`object-cover transition-transform duration-500 group-hover:scale-105 ${
-              // Sold out: muted, not black-and-white — the saree's colours stay recognisable.
-              outOfStock ? "opacity-80 saturate-[0.35]" : ""
-            }`}
-          />
+          <>
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              sizes={SIZES}
+              className={`object-cover transition duration-700 ease-out group-hover:scale-[1.04] motion-reduce:transition-none ${
+                hoverImage ? "group-hover:opacity-0" : ""
+              } ${
+                // Sold out: muted, not black-and-white — the saree's colours stay recognisable.
+                outOfStock ? "opacity-80 saturate-[0.35]" : ""
+              }`}
+            />
+            {hoverImage && !outOfStock && (
+              // Desktop only: `hidden` on phones also means the second photo is never downloaded there.
+              <Image
+                src={hoverImage}
+                alt=""
+                fill
+                sizes="(max-width: 1024px) 33vw, 25vw"
+                className="hidden scale-[1.04] object-cover opacity-0 transition duration-700 ease-out group-hover:scale-100 group-hover:opacity-100 motion-reduce:transition-none md:block"
+              />
+            )}
+          </>
         ) : (
           <div
             aria-hidden="true"
             className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/90 via-primary to-dark"
           >
-            <span className="font-serif text-5xl font-semibold text-surface/80">
-              {product.name.charAt(0)}
-            </span>
+            <span className="font-serif text-5xl font-semibold text-surface/80">{product.name.charAt(0)}</span>
           </div>
         )}
 
-        {/* Out of stock: diagonal ribbon across the top-left corner (the photo box clips its ends). */}
-        {outOfStock && (
-          <span className="pointer-events-none absolute -left-8 top-4 z-[2] w-32 -rotate-45 bg-primary py-0.5 text-center text-[9px] font-semibold uppercase tracking-wider text-surface shadow-md sm:-left-9 sm:top-5 sm:w-36 sm:py-1 sm:text-[10px]">
-            Out of Stock
+        {/* Discount tag (the price line below says the same for screen readers). */}
+        {percentOff >= MIN_TAG_PERCENT && !outOfStock && (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute left-2 top-2 z-[2] rounded-sm bg-primary px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-surface sm:left-3 sm:top-3 sm:px-2 sm:py-1 sm:text-[11px]"
+          >
+            −{percentOff}%
           </span>
         )}
 
-        {/* Wishlist heart */}
+        {/* Wishlist: soft frosted circle that reads on light and dark photos alike. */}
         <button
           type="button"
           onClick={toggleWishlist}
           aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           aria-pressed={wishlisted}
-          className="absolute right-2 top-2 z-[2] flex h-8 w-8 items-center justify-center rounded-full sm:right-3 sm:top-3 sm:h-9 sm:w-9 bg-surface/90 text-dark shadow-sm backdrop-blur transition-colors hover:text-red-500"
+          className="absolute right-2 top-2 z-[3] flex h-9 w-9 items-center justify-center rounded-full bg-dark/20 text-surface backdrop-blur-sm transition-colors hover:bg-dark/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface sm:right-3 sm:top-3"
         >
           <Heart
-            className={`h-4 w-4 sm:h-5 sm:w-5 transition-colors ${
+            className={`h-[18px] w-[18px] drop-shadow transition-colors ${
               wishlisted ? `fill-red-500 text-red-500 ${tapped ? "heart-pop" : ""}` : ""
             }`}
+            strokeWidth={1.75}
             aria-hidden="true"
           />
         </button>
+
+        {outOfStock ? (
+          <span className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] bg-surface/85 py-1.5 text-center text-[10px] font-semibold uppercase tracking-[0.25em] text-dark backdrop-blur-sm sm:py-2 sm:text-[11px]">
+            Sold out
+          </span>
+        ) : (
+          href && (
+            // Desktop: slides up on hover (and on keyboard focus inside the card). Phones: hidden.
+            <Link
+              href={href}
+              tabIndex={-1}
+              aria-hidden="true"
+              className="absolute inset-x-3 bottom-3 z-[2] hidden translate-y-[calc(100%+0.75rem)] items-center justify-center gap-2 rounded bg-surface/90 py-2.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-dark opacity-0 shadow-sm backdrop-blur-md transition duration-300 ease-out hover:bg-surface group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 motion-reduce:transition-none sm:flex"
+            >
+              View saree <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          )
+        )}
       </div>
 
-      <div className="flex flex-1 flex-col px-1 pt-2 sm:p-4">
-        {/* Always 2 lines tall (longer names end in "…"), so prices and buttons line up across a row. */}
+      <div className="flex flex-1 flex-col px-0.5 pt-3 sm:pt-4">
+        {/* Always one line tall, so names and prices line up across a row. */}
+        <p className="h-[1lh] truncate text-[10px] font-semibold uppercase tracking-[0.2em] text-secondary sm:text-[11px]">
+          {product.categoryName ?? ""}
+        </p>
+        {/* Always 2 lines tall (longer names end in "…"). */}
         <h3
-          className="line-clamp-2 min-h-[2lh] font-serif text-sm font-semibold leading-snug text-dark sm:text-lg sm:leading-normal"
+          className="mt-1 line-clamp-2 min-h-[2lh] font-serif text-sm font-semibold leading-snug text-dark sm:text-base"
           title={product.name}
         >
           {href ? (
-            <Link href={href} className="transition-colors hover:text-primary">
+            <Link href={href} className="transition-colors hover:text-primary focus-visible:outline-none focus-visible:underline">
               {product.name}
             </Link>
           ) : (
             product.name
           )}
         </h3>
-        <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5 text-[13px] sm:gap-x-2 sm:text-sm">
-          <span className="font-medium text-secondary">
-            {formatINR(product.price)}
-          </span>
-          {product.compareAtPrice != null && product.compareAtPrice > product.price && (
-            <>
-              <span className="text-muted line-through">
-                <span className="sr-only">Original price </span>
-                {formatINR(product.compareAtPrice)}
-              </span>
-              <span className="text-[11px] font-semibold text-green-700 sm:text-xs">
-                {Math.round((1 - product.price / product.compareAtPrice) * 100)}% off
-              </span>
-            </>
+
+        <p className="mt-1.5 flex flex-wrap items-baseline gap-x-2 text-sm">
+          <span className="font-semibold text-primary">{formatINR(product.price)}</span>
+          {onSale && (
+            <span className="text-xs text-muted line-through">
+              <span className="sr-only">Original price </span>
+              {formatINR(product.compareAtPrice!)}
+              <span className="sr-only">, {percentOff}% off</span>
+            </span>
           )}
         </p>
 
-        {/* Actions — desktop/tablet only. On phones the whole photo and name are the tap target. */}
-        <div className="mt-auto hidden flex-col gap-2 pt-4 sm:flex">
-          {href && outOfStock ? (
-            // Sold out: still worth a look (wishlist, share), but don't suggest it can be bought.
-            <Link
-              href={href}
-              className="rounded-full border border-border px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-muted transition-colors hover:border-primary hover:text-primary"
-            >
-              View details
-            </Link>
-          ) : href ? (
-            // Sarees come in sizes: pick one on the product page before adding to cart.
-            <Link
-              href={href}
-              className="rounded-full bg-primary px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-surface transition-colors hover:bg-dark"
-            >
-              Choose size
-            </Link>
-          ) : (
-            // No product page (old demo data): there's no size to add, so it can't go in the cart.
-            <button
-              type="button"
-              disabled
-              className="cursor-not-allowed rounded-full border border-border px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted"
-            >
-              Unavailable
-            </button>
-          )}
-        </div>
+        {!outOfStock && product.fewLeft != null && product.fewLeft > 0 && (
+          <p className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-primary/80 sm:text-xs">
+            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-primary/70" />
+            Only {product.fewLeft} left
+          </p>
+        )}
       </div>
     </div>
   );

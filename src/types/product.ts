@@ -30,8 +30,14 @@ export type ProductCardDto = {
   price: number;
   compareAtPrice: number | null;
   imageUrl: string | null;
+  /** Second photo, shown on hover (desktop); null/absent when there's only one. */
+  hoverImageUrl?: string | null;
+  /** e.g. "Kantha Stitch" */
+  categoryName?: string | null;
   /** false when every size is sold out */
   inStock: boolean;
+  /** Pieces left (all sizes) when 3 or fewer, else null. Older APIs don't send it. */
+  fewLeft?: number | null;
 };
 
 /** `GET /products` response body. */
@@ -47,9 +53,20 @@ export type ProductCardItem = {
   /** Rupees — struck-through original price when on discount. */
   compareAtPrice?: number | null;
   image: string | null;
+  /** Second photo, crossfaded in on hover (desktop only). */
+  hoverImage?: string | null;
+  /** Small gold label above the name. */
+  categoryName?: string | null;
   /** Defaults to true when omitted. */
   inStock?: boolean;
+  /** "Only N left" when set (live data only; never stored in the guest wishlist). */
+  fewLeft?: number | null;
+  /** Optional ribbon, e.g. "Customer favourite" (homepage picks; shown by HandpickedCard). */
+  badge?: string | null;
 };
+
+/** One `GET /home-picks` item: a product card plus its optional ribbon. Prices in paise. */
+export type HomePickDto = ProductCardDto & { badge: string | null };
 
 /** A page of cards, ready for the UI. */
 export type ProductCardPage = {

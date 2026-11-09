@@ -6,6 +6,7 @@
  */
 export const CACHE_TAGS = {
   banners: "banners",
+  homePicks: "home-picks",
   categories: "categories",
   products: "products",
   reviews: "reviews",
@@ -18,6 +19,9 @@ export const CATEGORY_SLUGS = {
   /** Parent whose sub-categories fill "Our Top Categories" on the home page. */
   homeTopCategoriesParent: "saree",
 } as const;
+
+/** Products in the homepage "Handpicked for You" section: all on desktop, the first half on phones (backend allows up to 24). */
+export const HOME_PICKS_LIMIT = 8;
 
 /** Products per page on listing pages (backend allows up to 48). */
 export const PRODUCTS_PER_PAGE = 24;

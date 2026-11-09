@@ -4,6 +4,7 @@ import { siteConfig } from "@/config/siteConfig";
 import { absoluteUrl, pageMetadata } from "@/lib/seo";
 import HeroBanners from "@/components/home/HeroBanners";
 import TopCategories from "@/components/home/TopCategories";
+import HomePicks from "@/components/home/HomePicks";
 import AffordableSarees from "@/components/home/AffordableSarees";
 import Testimonials from "@/components/home/Testimonials";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -79,6 +80,23 @@ function TopCategoriesFallback() {
   );
 }
 
+/** Roughly the picks section's size while it loads (the section hides itself if nothing is live). */
+function HomePicksFallback() {
+  return (
+    <div aria-hidden="true" className="bg-dark py-20 sm:py-24">
+      <div className="mx-auto flex max-w-[1440px] gap-5 overflow-hidden px-4 pt-32 sm:px-6 md:grid md:grid-cols-4 md:gap-6 lg:gap-8 lg:px-8">
+        {Array.from({ length: 4 }, (_, i) => (
+          <div key={i} className="w-[70%] shrink-0 sm:w-[42%] md:w-auto">
+            <div className="aspect-[3/4] animate-pulse rounded-t-full bg-surface/10" />
+            <div className="mx-auto mt-5 h-4 w-3/4 animate-pulse rounded bg-surface/10" />
+            <div className="mx-auto mt-3 h-4 w-1/3 animate-pulse rounded bg-surface/10" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   return (
     <>
@@ -91,6 +109,9 @@ export default function Home() {
       </Suspense>
       <Suspense fallback={<TopCategoriesFallback />}>
         <TopCategories />
+      </Suspense>
+      <Suspense fallback={<HomePicksFallback />}>
+        <HomePicks />
       </Suspense>
       <AffordableSarees />
       <Testimonials />

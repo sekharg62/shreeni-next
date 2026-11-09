@@ -1,12 +1,9 @@
 import type { ReactNode } from "react";
 import type { ProductColor, ProductDetail, ProductSpec } from "@/types/product";
 import Accordion from "./Accordion";
+import { metres } from "./ProductHighlights";
 import { paragraphs } from "./ProductStory";
-
-/** 550 → "5.5 m"; 115 → "1.15 m" (sarees are measured in metres). */
-function metres(cm: number): string {
-  return `${Number((cm / 100).toFixed(2))} m`;
-}
+import SectionTitle from "./SectionTitle";
 
 const COLOR_LABEL: Record<ProductColor["type"], string> = {
   PRIMARY: "Main colour",
@@ -17,9 +14,9 @@ type Row = { label: string; value: ReactNode };
 
 function DefinitionTable({ rows }: { rows: Row[] }) {
   return (
-    <dl className="divide-y divide-border rounded-lg border border-border bg-surface">
+    <dl className="divide-y divide-border/70">
       {rows.map((r) => (
-        <div key={r.label} className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-4 px-4 py-3 text-sm">
+        <div key={r.label} className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-4 py-3 text-sm">
           <dt className="text-muted">{r.label}</dt>
           <dd className="font-medium text-dark">{r.value}</dd>
         </div>
@@ -72,13 +69,10 @@ export default function ProductDetails({ product }: { product: ProductDetail }) 
 
   return (
     <section aria-labelledby="details-heading">
-      <h2 id="details-heading" className="font-serif text-2xl font-semibold text-dark sm:text-3xl">
-        Details
-      </h2>
-      <div className="mt-2 h-0.5 w-16 bg-secondary" />
+      <SectionTitle id="details-heading" eyebrow="About this saree" title="Details & care" />
 
-      <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <div className="space-y-4 leading-relaxed text-dark/85">
+      <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-16">
+        <div className="max-w-prose space-y-4 text-[15px] leading-relaxed text-dark/85 first-letter:float-left first-letter:mr-2 first-letter:font-serif first-letter:text-5xl first-letter:leading-[0.9] first-letter:text-primary">
           {paragraphs(product.description).map((p, i) => (
             <p key={i} className="whitespace-pre-line">
               {p}
@@ -86,10 +80,10 @@ export default function ProductDetails({ product }: { product: ProductDetail }) 
           ))}
         </div>
 
-        {/* Tap a heading to see more; all closed by default. */}
+        {/* Product details open by default; tap a heading to see more. */}
         <div className="self-start border-t border-border">
           {factRows.length > 0 && (
-            <Accordion title="Product details">
+            <Accordion title="Product details" defaultOpen>
               <DefinitionTable rows={factRows} />
             </Accordion>
           )}

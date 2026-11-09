@@ -59,7 +59,9 @@ function loadLocal(): ProductCardItem[] {
 
 function saveLocal(items: ProductCardItem[]) {
   try {
-    if (items.length) window.localStorage.setItem(WISHLIST_KEY, JSON.stringify(items));
+    // "Only N left" goes stale fast, so the saved copy leaves it out.
+    const snapshot = items.map((p) => ({ ...p, fewLeft: null }));
+    if (items.length) window.localStorage.setItem(WISHLIST_KEY, JSON.stringify(snapshot));
     else window.localStorage.removeItem(WISHLIST_KEY);
   } catch {
     /* storage blocked — the wishlist still works for this visit */

@@ -3,6 +3,10 @@ export const ENDPOINTS = {
   banners: {
     list: "/banners",
   },
+  homePicks: {
+    /** ?limit= (1–24) — the admin's "Handpicked for You" products, live ones only, in order */
+    list: "/home-picks",
+  },
   categories: {
     /** ?slug=<parent> → its published children */
     children: "/categories/children",

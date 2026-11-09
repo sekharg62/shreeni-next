@@ -2,6 +2,7 @@ import { MessageSquareText } from "lucide-react";
 import { Stars } from "@/components/ui/StarRating";
 import { getProductReviews } from "@/lib/data/catalog";
 import ReviewList from "./ReviewList";
+import SectionTitle from "./SectionTitle";
 import WriteReview from "./WriteReview";
 
 type Props = { slug: string; productName: string };
@@ -14,10 +15,7 @@ export default async function ProductReviews({ slug, productName }: Props) {
 
   return (
     <section id="reviews" aria-labelledby="reviews-heading" className="scroll-mt-28">
-      <h2 id="reviews-heading" className="font-serif text-2xl font-semibold text-dark sm:text-3xl">
-        Customer Reviews
-      </h2>
-      <div className="mt-2 h-0.5 w-16 bg-secondary" />
+      <SectionTitle id="reviews-heading" eyebrow="From our customers" title="Reviews" />
 
       {count > 0 && summary && page ? (
         <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
@@ -39,7 +37,7 @@ export default async function ProductReviews({ slug, productName }: Props) {
                 return (
                   <li key={k} className="flex items-center gap-3 text-sm">
                     <span className="w-10 shrink-0 text-muted">{k} star</span>
-                    <span className="h-2 flex-1 overflow-hidden rounded-full bg-background" aria-hidden="true">
+                    <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-border/60" aria-hidden="true">
                       <span className="block h-full rounded-full bg-secondary" style={{ width: `${pct}%` }} />
                     </span>
                     <span className="w-8 shrink-0 text-right text-muted">{n}</span>
