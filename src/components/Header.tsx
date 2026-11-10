@@ -19,10 +19,10 @@ export default function Header() {
             src="/logo.webp"
             alt={`${siteConfig.name} Sarees`}
             width={800}
-            height={347}
+            height={531}
             priority
             unoptimized
-            className="h-10 w-auto sm:h-12"
+            className="h-14 w-auto sm:h-16"
           />
         </Link>
 

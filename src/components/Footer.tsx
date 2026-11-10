@@ -39,10 +39,10 @@ export default function Footer() {
             src="/logo.webp"
             alt={`${siteConfig.name} Sarees`}
             width={800}
-            height={347}
+            height={531}
             unoptimized
-            // The logo's dark blue lettering needs a soft light edge to read on the dark footer.
-            className="h-20 w-auto [filter:drop-shadow(0_0_0.75px_rgba(255,253,249,0.95))_drop-shadow(0_0_1px_rgba(255,253,249,0.6))_drop-shadow(0_0_8px_rgba(255,253,249,0.18))]"
+            // Soft light halo so the crimson lettering stays legible on the dark burgundy footer.
+            className="h-28 w-auto [filter:drop-shadow(0_0_6px_rgba(255,253,249,0.22))]"
           />
           <p className="max-w-xs text-sm text-background/70">
             {siteConfig.tagline}
