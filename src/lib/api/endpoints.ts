@@ -77,6 +77,10 @@ export const ENDPOINTS = {
     place: "/orders",
     /** POST { orderNumber, contact } — look an order up with the phone/email used (public) */
     track: "/orders/track",
+    /** POST { orderNumber, contact } → invoice PDF (same check as tracking) */
+    trackInvoice: "/orders/track/invoice",
+    /** GET → the signed-in customer's invoice PDF */
+    invoice: (orderNumber: string) => `/me/orders/${encodeURIComponent(orderNumber)}/invoice`,
     /** GET ?page=&limit= — the signed-in customer's orders */
     mine: "/me/orders",
     one: (orderNumber: string) => `/me/orders/${encodeURIComponent(orderNumber)}`,

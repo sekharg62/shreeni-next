@@ -7,6 +7,7 @@ import { useToast } from "@/context/ToastContext";
 import { getApiErrorMessage, getApiErrorStatus } from "@/lib/api";
 import { orderService } from "@/services/orderService";
 import type { OrderDetail } from "@/types/order";
+import InvoiceButton from "./InvoiceButton";
 import OrderDetailView from "./OrderDetailView";
 
 const CANCEL_REASONS = [
@@ -155,6 +156,13 @@ export default function MyOrderDetail({ orderNumber }: { orderNumber: string }) 
                 : "Need to change or return something?"}
           </p>
           <div className="flex flex-col gap-2 sm:flex-row">
+            {order.hasInvoice && (
+              <InvoiceButton
+                fetchPdf={() => orderService.invoice(order.orderNumber)}
+                invoiceNumber={order.invoiceNumber}
+                orderNumber={order.orderNumber}
+              />
+            )}
             <Link
               href="/account/support/new"
               className="inline-flex items-center justify-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-semibold text-dark transition-colors hover:border-primary hover:text-primary"

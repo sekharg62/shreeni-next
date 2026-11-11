@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { getApiErrorMessage } from "@/lib/api";
 import { orderService } from "@/services/orderService";
 import type { OrderDetail } from "@/types/order";
+import InvoiceButton from "./InvoiceButton";
 import OrderDetailView from "./OrderDetailView";
 
 const ORDER_ID = /^OD\d{12}$/;
@@ -22,6 +23,8 @@ export default function TrackOrder() {
   const [contact, setContact] = useState("");
   const [errors, setErrors] = useState<{ orderNumber?: string; contact?: string }>({});
   const [result, setResult] = useState<OrderDetail | null>(null);
+  /** The phone/email that found `result` (needed again to download its invoice). */
+  const [foundWith, setFoundWith] = useState("");
   const [notFound, setNotFound] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -40,6 +43,7 @@ export default function TrackOrder() {
     setNotFound(null);
     try {
       setResult(await orderService.track(number, c));
+      setFoundWith(c);
     } catch (err) {
       setResult(null);
       setNotFound(getApiErrorMessage(err, "We couldn't find that order. Please check the details."));
@@ -101,7 +105,25 @@ export default function TrackOrder() {
         )}
       </form>
 
-      <div aria-live="polite">{result && <OrderDetailView order={result} />}</div>
+      <div aria-live="polite">
+        {result && (
+          <OrderDetailView
+            order={result}
+            actions={
+              result.hasInvoice ? (
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-sm text-muted">Your invoice for this order, as a PDF.</p>
+                  <InvoiceButton
+                    fetchPdf={() => orderService.trackInvoice(result.orderNumber, foundWith)}
+                    invoiceNumber={result.invoiceNumber}
+                    orderNumber={result.orderNumber}
+                  />
+                </div>
+              ) : undefined
+            }
+          />
+        )}
+      </div>
     </div>
   );
 }

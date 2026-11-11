@@ -51,6 +51,10 @@ export type OrderDetailDto = {
   cancelledAt: string | null;
   cancelReason: string | null;
   canCancel: boolean;
+  /** e.g. "SHR/26-27/0001"; null until the order is confirmed (older APIs don't send it). */
+  invoiceNumber?: string | null;
+  /** An invoice PDF can be downloaded. */
+  hasInvoice?: boolean;
 };
 
 export type OrderSummaryDto = {

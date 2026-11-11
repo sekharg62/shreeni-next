@@ -74,6 +74,22 @@ export const orderService = {
     return { data: data.data.map(toSummary), meta: data.meta };
   },
 
+  /** The signed-in customer's invoice PDF. */
+  async invoice(orderNumber: string): Promise<Blob> {
+    const { data } = await authApiClient.get<Blob>(ENDPOINTS.orders.invoice(orderNumber), { responseType: "blob", timeout: 30000 });
+    return data;
+  },
+
+  /** A guest's invoice PDF: same order number + phone/email check as tracking. */
+  async trackInvoice(orderNumber: string, contact: string): Promise<Blob> {
+    const { data } = await apiClient.post<Blob>(
+      ENDPOINTS.orders.trackInvoice,
+      { orderNumber, contact },
+      { responseType: "blob", timeout: 30000 },
+    );
+    return data;
+  },
+
   async get(orderNumber: string): Promise<OrderDetail> {
     const { data } = await authApiClient.get<OrderDetailDto>(ENDPOINTS.orders.one(orderNumber));
     return toOrderDetail(data);
