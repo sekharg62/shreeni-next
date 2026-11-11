@@ -9,13 +9,12 @@ const SIZES = "(max-width: 768px) 72vw, (max-width: 1440px) 25vw, 340px";
 
 /**
  * "Handpicked for You" card, for the dark showcase band: the photo inside a temple arch
- * (a nod to Bishnupur's terracotta temple doorways), a double gold outline, a large gold
- * number in the arch's empty corner, and a quiet serif caption instead of buttons.
+ * (a nod to Bishnupur's terracotta temple doorways), a double gold outline, and a quiet
+ * serif caption instead of buttons.
  */
-export default function HandpickedCard({ product, position }: { product: ProductCardItem; position: number }) {
+export default function HandpickedCard({ product }: { product: ProductCardItem }) {
   const href = product.slug ? `/products/${product.slug}` : "/sarees";
   const onSale = product.compareAtPrice != null && product.compareAtPrice > product.price;
-  const number = String(position).padStart(2, "0");
 
   return (
     <Link
@@ -57,14 +56,6 @@ export default function HandpickedCard({ product, position }: { product: Product
             )}
           </div>
         </div>
-
-        {/* "No. 01": sits in the empty corner beside the arch's curve. */}
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute left-0 top-0 font-serif text-4xl italic leading-none text-secondary/60 transition-colors duration-500 group-hover:text-secondary sm:text-5xl"
-        >
-          {number}
-        </span>
       </div>
 
       <div className="px-1 pt-5">

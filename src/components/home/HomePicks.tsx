@@ -58,9 +58,9 @@ export default async function HomePicks() {
         <ul
           className="no-scrollbar -mx-4 mt-12 flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-px-4 px-4 pb-2 pt-1 sm:-mx-6 sm:scroll-px-6 sm:px-6 sm:mt-14 md:mx-0 md:grid md:grid-cols-4 md:gap-6 md:overflow-visible md:px-0 md:pb-0 lg:gap-8"
         >
-          {picks.map((p, i) => (
+          {picks.map((p) => (
             <li key={p.id} className="w-[70%] shrink-0 snap-start sm:w-[42%] md:w-auto">
-              <HandpickedCard product={p} position={i + 1} />
+              <HandpickedCard product={p} />
             </li>
           ))}
         </ul>
