@@ -3,18 +3,54 @@ import Image from "next/image";
 import AccountButton from "./AccountButton";
 import { siteConfig } from "@/config/siteConfig";
 import { navLinks } from "@/config/nav";
+import { CATEGORY_SLUGS } from "@/config/constants";
 import MobileMenu from "@/components/MobileMenu";
 import CartButton from "@/components/CartButton";
 import WishlistButton from "@/components/WishlistButton";
-import Container from "@/components/Container";
 import { SearchButton } from "@/components/search/SearchDialog";
+import { getTopCategories } from "@/components/home/TopCategories";
+import HeaderShell from "@/components/header/HeaderShell";
+import DesktopNav, { type MenuWeave } from "@/components/header/DesktopNav";
 
-export default function Header() {
+/** Weaves for the Sarees mega-menu (cached; [] if the backend is down — the menu then uses the nav list). */
+async function menuWeaves(): Promise<MenuWeave[]> {
+  const { data } = await getTopCategories(CATEGORY_SLUGS.homeTopCategoriesParent, 1, 12);
+  return data.map((c) => ({
+    name: c.name,
+    href: `/sarees/${c.slug}`,
+    posterUrl: c.posterUrl,
+    tagline: c.tagline,
+    minPrice: c.minPrice,
+  }));
+}
+
+/**
+ * Site header: centred logo between the menu (left) and the actions (right).
+ * Tall at the top of the page; once scrolled it shrinks and gains a soft shadow (HeaderShell).
+ * Phones: menu + search · logo · cart.
+ */
+export default async function Header() {
+  const weaves = await menuWeaves();
+  const whatsappHref = `https://wa.me/${siteConfig.contact.whatsapp.replace(/\D/g, "")}`;
+
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-surface/90 backdrop-blur">
-      <Container className="flex h-16 items-center justify-between gap-4 sm:h-[72px]">
-        {/* Brand */}
-        <Link href="/" aria-label={`${siteConfig.name} — Home`} className="flex shrink-0 items-center">
+    <HeaderShell>
+      <div className="relative mx-auto grid h-16 max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 transition-[height] duration-300 sm:px-6 md:h-[84px] md:group-data-[scrolled=true]/hdr:h-16 lg:px-8">
+        {/* Left: menu (desktop) · menu toggle + search (phones) */}
+        <div className="flex h-full items-center">
+          <DesktopNav links={navLinks} weaves={weaves} whatsappHref={whatsappHref} />
+          <div className="-ml-2 flex items-center md:hidden">
+            <MobileMenu />
+            <SearchButton />
+          </div>
+        </div>
+
+        {/* Centre: logo */}
+        <Link
+          href="/"
+          aria-label={`${siteConfig.name} — Home`}
+          className="flex shrink-0 items-center justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+        >
           <Image
             src="/logo.webp"
             alt={`${siteConfig.name} Sarees`}
@@ -22,60 +58,20 @@ export default function Header() {
             height={531}
             priority
             unoptimized
-            className="h-14 w-auto sm:h-16"
+            className="h-12 w-auto transition-[height] duration-300 md:h-[68px] md:group-data-[scrolled=true]/hdr:h-12"
           />
         </Link>
 
-        {/* Nav */}
-        <nav className="hidden h-full items-center gap-6 md:flex lg:gap-8">
-          {navLinks.map((link) => (
-            <div key={link.href} className="group relative flex h-full items-center">
-              <Link
-                href={link.href}
-                className="flex h-full items-center text-base font-medium text-dark transition-colors group-hover:text-primary"
-              >
-                <span className="relative after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 after:ease-out group-hover:after:scale-x-100">
-                  {link.label}
-                </span>
-              </Link>
-
-              {link.items && (
-                <div className="invisible absolute left-1/2 top-full z-40 w-60 -translate-x-1/2 translate-y-2 pt-3 opacity-0 transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                  <ul className="overflow-hidden rounded-md border border-border bg-surface py-2 shadow-xl shadow-dark/10">
-                    {link.items.map((item) => (
-                      <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          className="block px-4 py-2.5 text-sm text-dark transition-colors hover:bg-background hover:text-primary"
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          ))}
-        </nav>
-
-        {/* Actions (desktop) */}
-        <div className="hidden items-center gap-1 md:flex sm:gap-2">
-          <SearchButton shortcuts />
-
-          <AccountButton />
-
-          <WishlistButton />
-
+        {/* Right: actions */}
+        <div className="flex items-center justify-end gap-0.5 sm:gap-1">
+          <div className="hidden items-center gap-0.5 md:flex lg:gap-1">
+            <SearchButton shortcuts />
+            <AccountButton />
+            <WishlistButton />
+          </div>
           <CartButton />
         </div>
-
-        {/* Phones: search + menu */}
-        <div className="flex items-center gap-1 md:hidden">
-          <SearchButton />
-          <MobileMenu />
-        </div>
-      </Container>
-    </header>
+      </div>
+    </HeaderShell>
   );
 }
