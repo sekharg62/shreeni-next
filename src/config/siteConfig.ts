@@ -62,8 +62,8 @@ export const siteConfig = {
 
   // --- Contact info ---
   contact: {
-    email: "support@shreeni.example.com",
-    salesEmail: "sales@shreeni.example.com",
+    email: "collection.shreeni@gmail.com",
+    salesEmail: "collection.shreeni@gmail.com",
     phone: "+91 97485 94143",
     whatsapp: "+91 97485 94143",
     supportHours: "Mon–Sat, 10:00 AM – 7:00 PM IST",

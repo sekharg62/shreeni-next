@@ -15,6 +15,8 @@ const helpLinks = [
   { label: "Returns & Exchange", href: "/returns" },
   { label: "Track Order", href: "/track" },
   { label: "FAQs", href: "/faqs" },
+  { label: "Terms & Conditions", href: "/terms" },
+  { label: "Privacy Policy", href: "/privacy" },
 ];
 
 const socialLinks = [
@@ -134,7 +136,7 @@ export default function Footer() {
               Privacy Policy
             </Link>
             <Link href="/terms" className="hover:text-secondary">
-              Terms of Service
+              Terms &amp; Conditions
             </Link>
           </div>
         </Container>
